@@ -1,0 +1,318 @@
+{
+	"podcastBlocked": "no",
+	"lastUpdate": "2023-08-28T08:52:48.361Z",
+	"type": 0,
+	"title": "100% Retro - Live 24/7",
+	"description": "100% Retro is a 24/7 Live Radio stream with hosts broadcasting live from all over the globe with music that makes you feel young again! Now live in the Podverse App with Live Chat and Boosts and on Dektop in Curiocaster.",
+	"link": "https://100percentretro.com/",
+	"explicit": false,
+	"itunesBlock": false,
+	"itunesComplete": false,
+	"itunesImage": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+	"language": "en",
+	"itunesCategory": ["Music"],
+	"generator": "FreePod",
+	"pubDate": "2023-08-28T08:00:09.000Z",
+	"lastBuildDate": "2023-08-28T08:00:09.000Z",
+	"categories": ["music", "history"],
+	"author": "info@100percentretro.com",
+	"image": {
+		"url": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+		"title": "100% Retro - Live 24/7",
+		"link": "https://100percentretro.com/",
+		"width": 144,
+		"height": 144
+	},
+	"summary": "100% Retro is a 24/7 Live Radio stream with hosts broadcasting live from all over the globe with music that makes you feel young again! Now live in the Podverse App with Live Chat and Boosts and on Dektop in Curiocaster.",
+	"subtitle": "100% Retro - Feel Young Again - Live 24/7",
+	"copyright": "100% RETRO",
+	"webmaster": "info@100percentretro.com",
+	"managingEditor": "info@100percentretro.com",
+	"items": [
+		{
+			"guid": "03468468-F44C-4D0C-B4A9-27F3CD54C86C-1039-00000EE2D1D0014B-FFA",
+			"enclosure": {
+				"url": "https://mp3s.nashownotes.com/thisweek1.mp3",
+				"length": null,
+				"type": "audio/mpeg"
+			},
+			"duration": 120813,
+			"explicit": false,
+			"title": "This week on 100% Retro",
+			"author": "info@100percentretro.com",
+			"link": "https://100percentretro.com/",
+			"itunesImage": "https://feeds.podcastindex.org/100retro.png",
+			"keywords": ["music", "live", "streaming", "retro", "70s", "80s"],
+			"pubDate": "2023-08-28T08:00:01.000Z",
+			"image": "https://feeds.podcastindex.org/100retro.png",
+			"summary": "100% Retro is a 24/7 Live Radio stream with hosts broadcasting live from all over the globe with \n                       music that makes you feel young again! Now live in the Podverse App with Live Chat and Boosts \n                       and on Dektop in Curiocaster.",
+			"description": "100% Retro is a 24/7 Live Radio stream with hosts broadcasting live from all over the globe with music that makes you feel young again! Now live in the Podverse App with Live Chat and Boosts and on Dektop in Curiocaster.",
+			"subtitle": "Feel young again.",
+			"value": {
+				"type": "lightning",
+				"method": "keysend",
+				"suggested": 5e-8,
+				"recipients": [
+					{
+						"name": "100% Retro HQ",
+						"customKey": "696969",
+						"customValue": "ROK7iZF18vHIWXNr54xr",
+						"type": "node",
+						"address": "030a58b8653d32b99200a2334cfe913e51dc7d155aa0116c176657a4f1722677a3",
+						"split": 90,
+						"fee": false
+					},
+					{
+						"name": "Stats",
+						"customKey": "696969",
+						"customValue": "gq0Z8b1wEftMkFL4vj7E",
+						"type": "node",
+						"address": "030a58b8653d32b99200a2334cfe913e51dc7d155aa0116c176657a4f1722677a3",
+						"split": 5,
+						"fee": false
+					},
+					{
+						"name": "Podcast Index",
+						"type": "node",
+						"address": "03ae9f91a0cb8ff43840e3c322c4c61f019d8c1c3cea15a25cfc425ac605e61a4a",
+						"split": 5,
+						"fee": false
+					}
+				]
+			}
+		}
+	],
+	"pc20support": {
+		"2": ["person", "location"],
+		"3": ["guid"],
+		"4": ["value", "medium", "liveItem"]
+	},
+	"podcastPeople": [
+		{
+			"name": "Steve Penk",
+			"role": "Host",
+			"group": "Cast",
+			"img": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+			"href": "https://100percentretro.com/schedule-monday-friday/"
+		}
+	],
+	"podcastLocation": { "name": "London, UK" },
+	"guid": "27293ad7-c199-5047-8135-a864fb546492",
+	"value": {
+		"type": "lightning",
+		"method": "keysend",
+		"suggested": 5e-8,
+		"recipients": [
+			{
+				"name": "100% Retro HQ",
+				"customKey": "696969",
+				"customValue": "ROK7iZF18vHIWXNr54xr",
+				"type": "node",
+				"address": "030a58b8653d32b99200a2334cfe913e51dc7d155aa0116c176657a4f1722677a3",
+				"split": 90,
+				"fee": false
+			},
+			{
+				"name": "Stats",
+				"customKey": "696969",
+				"customValue": "gq0Z8b1wEftMkFL4vj7E",
+				"type": "node",
+				"address": "030a58b8653d32b99200a2334cfe913e51dc7d155aa0116c176657a4f1722677a3",
+				"split": 5,
+				"fee": false
+			},
+			{
+				"name": "Podcast Index",
+				"type": "node",
+				"address": "03ae9f91a0cb8ff43840e3c322c4c61f019d8c1c3cea15a25cfc425ac605e61a4a",
+				"split": 5,
+				"fee": false
+			}
+		]
+	},
+	"medium": "music",
+	"podcastLiveItems": [
+		{
+			"status": "live",
+			"start": "2023-08-28T08:00:00.000Z",
+			"end": "2023-08-28T09:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-10",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Rewind - Steve Penk",
+			"description": "From mid-morning in the UK, Europe, Africa and the Middle East, to the early morning dawn in North and South America… broadcasting from London, UK… Steve Penk hosts his daily REWIND show on 100% RETRO. You’ll hear candid jokes, controversial talks and Steve’s unique brand of entertainment. Join us for your daily dose of music, news and artist interviews that you won’t hear anywhere else. No matter where you are in the world, Steve will be there to wake you up and keep you up!",
+			"link": "https://100percentretro.com/",
+			"author": "Steve Penk",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Steve Penk",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		},
+		{
+			"status": "pending",
+			"start": "2023-08-28T11:00:00.000Z",
+			"end": "2023-08-28T13:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-6",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Angel of the Morning - Joëlle Harper",
+			"description": "Your “Angel Of The Morning” in the UK, Europe, Africa and the Middle East. Joëlle Harper, from Beirut, Lebanon and straight into the land of memories: 100% RETRO. Joëlle is your shining breakfast star! Waking you up across the Atlantic, while North and South America transitions from day to night. With the brightest smile and the best taste in classic music, Joëlle wakes you up in the East, as the sun sets in the West.",
+			"link": "https://100percentretro.com/",
+			"author": "Joëlle Harper",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Joelle-Harper-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Joëlle Harper",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Joelle-Harper-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		},
+		{
+			"status": "pending",
+			"start": "2023-08-28T13:00:00.000Z",
+			"end": "2023-08-28T15:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-8",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Beautiful Noise - Dan Harper",
+			"description": "Dan Harper hosts two flavors of the same show. For listeners in the UK, Europe, Africa and the Middle East, we call it “The Big Retro Breakfast Show” while listeners in North and South America know it as “The Big Retro Late Night Show.” Dan is an early bird who produces Joëlle’s show (06:00-08:00 CET) and receives her editorial assistance with his program. Together, they’re 100% RETRO’s morning or evening power team. Joëlle and Dan will inspire you to start or finish your day the right way. Let’s call it… a beautiful noise!",
+			"link": "https://100percentretro.com/",
+			"author": "Dan Harper",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Dan-Harper-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Dan Harper",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Dan-Harper-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		},
+		{
+			"status": "pending",
+			"start": "2023-08-28T15:00:00.000Z",
+			"end": "2023-08-28T16:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-10",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Rewind - Steve Penk",
+			"description": "From mid-morning in the UK, Europe, Africa and the Middle East, to the early morning dawn in North and South America… broadcasting from London, UK… Steve Penk hosts his daily REWIND show on 100% RETRO. You’ll hear candid jokes, controversial talks and Steve’s unique brand of entertainment. Join us for your daily dose of music, news and artist interviews that you won’t hear anywhere else. No matter where you are in the world, Steve will be there to wake you up and keep you up!",
+			"link": "https://100percentretro.com/",
+			"author": "Steve Penk",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Steve Penk",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Steve-Penk-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		},
+		{
+			"status": "pending",
+			"start": "2023-08-28T16:00:00.000Z",
+			"end": "2023-08-28T17:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-11",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Let the Music Play - Polly Winder",
+			"description": "Polly Winder plays your favorite songs in “Let The Music Play”. You select the songs and we go back in time. WhatsApp, facebook or email your favorite classics from the past... and let us know where you were when your song was hitting the charts. From the UK and broadcasting worldwide, Polly serves up your daily taste of retro before another lady (Nádine) takes over in Johanneburg! Send us your retro requests from all across the planet and “Let The Music Play” with Polly Winder.",
+			"link": "https://100percentretro.com/",
+			"author": "Polly Winder",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Polly-Winder-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Polly Winder",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Polly-Winder-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		},
+		{
+			"status": "pending",
+			"start": "2023-08-28T17:00:00.000Z",
+			"end": "2023-08-28T20:00:00.000Z",
+			"guid": "1733C4C8-47BE-4EBA-A759-DBF6ED7ABF9B-2023-28-1-12",
+			"enclosure": {
+				"url": "https://play.adtonos.com/100-percent-retro",
+				"length": 73,
+				"type": "audio/mpeg"
+			},
+			"title": "Memories - Nadine",
+			"description": "“Memories”… your flashback to the past! Historical events, famous happenings, weddings, deaths, celebrity gossip. Broadcasting from Johannesburg, South Africa, Nádine tells all in a 3-hour appointment with the past. Memories and moments in time. What was the No.1 song on the day you were born? What happened today in music history? We’ll bring you all the facts and figures. Plus, the most important news from yesterday. Nádine with “Memories”… every weekday on 100% RETRO.",
+			"link": "https://100percentretro.com/",
+			"author": "Nadine",
+			"image": "https://100percentretro.com/wp-content/uploads/2022/07/Nadine-Mon-Fri.jpg",
+			"podcastPeople": [
+				{
+					"name": "Nadine",
+					"role": "Host",
+					"group": "Cast",
+					"img": "https://100percentretro.com/wp-content/uploads/2022/07/Nadine-Mon-Fri.jpg",
+					"href": "https://100percentretro.com/schedule-monday-friday/"
+				}
+			],
+			"chat": {
+				"phase": "4",
+				"url": "https://kiwiirc.com/nextclient/irc.zeronode.net/#100retro"
+			},
+			"contentLinks": []
+		}
+	],
+	"newestItemPubDate": "2023-08-28T08:00:01.000Z",
+	"oldestItemPubDate": "2023-08-28T08:00:01.000Z"
+}
