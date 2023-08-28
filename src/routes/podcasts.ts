@@ -17,7 +17,7 @@ export const getPodcast = async <R extends string>(ctx: RouterContext<R>) => {
 		// 	const data = await trending.json();
 		// 	res.body = data;
 		// }
-		const feed = await feedParser(testLive);
+		const feed = await feedParser(test);
 		if (feed) {
 			res.body = feed;
 		}
