@@ -3,8 +3,14 @@ import { Hono, HTTPException } from "hono";
 import { prettyJSON, bearerAuth } from "hono/middleware.ts";
 import { podcast, category } from "#/routes/routes.ts";
 import { Status } from "http-status";
+import { updateFeed } from "#/script/updateDb.ts";
+import { cron } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
 
 const app = new Hono();
+
+cron(`1 0 */2 * * *`, async () => {
+	await updateFeed();
+});
 
 /**
  * make response json pretty

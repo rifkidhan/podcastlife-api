@@ -1,11 +1,12 @@
 import { podcastApi } from "#/controllers/podcastapi.ts";
 import { feedParser } from "#/controllers/parsefeed.ts";
 import { getPodcastByFeedId, getPodcastsByTag } from "#/controllers/podcast.ts";
-import { integer } from "#/helpers/matching.ts";
+import { integer, language } from "#/helpers/matching.ts";
+import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { Context } from "hono";
 import { Status } from "http-status";
 
-const now = Math.floor(Date.now() / 1000) - 604800;
+const now = Math.floor(Date.now() / 1000) - 86400;
 
 export const getPodcastByFeedIdRoute = async (c: Context) => {
 	const id = c.req.param("feedId");
@@ -44,12 +45,13 @@ export const getTrending = async (c: Context) => {
 
 	try {
 		const trending = await podcastApi(
-			`/podcasts/trending?max=${maxResponse}&since=${now}&pretty`
+			`/podcasts/trending?max=${maxResponse}&since=${now}&lang=${language}&pretty`
 		);
-		if (trending) {
+		if (trending.ok) {
 			const data = await trending.json();
 			return c.json({ data, ok: true }, Status.OK);
 		}
+		errorPodcastApi(trending.status);
 	} catch (error) {
 		throw error;
 	}

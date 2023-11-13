@@ -12,6 +12,7 @@
     }
   },
   "redirects": {
+    "https://deno.land/x/deno_cron/cron.ts": "https://deno.land/x/deno_cron@v1.0.0/cron.ts",
     "https://deno.land/x/hono/helper.ts": "https://deno.land/x/hono@v3.10.0/helper.ts",
     "https://deno.land/x/hono/middleware.ts": "https://deno.land/x/hono@v3.10.0-rc.2/middleware.ts",
     "https://deno.land/x/hono/mod.ts": "https://deno.land/x/hono@v3.10.0-rc.2/mod.ts"
@@ -128,6 +129,7 @@
     "https://deno.land/std@0.200.0/encoding/base64url.ts": "2ed4ba122b20fedf226c5d337cf22ee2024fa73a8f85d915d442af7e9ce1fae1",
     "https://deno.land/std@0.200.0/encoding/hex.ts": "b4b1a7cb678745b0bf181ed8cf2498c7be00d121a7de244b752fbf9c7d9c48cd",
     "https://deno.land/std@0.206.0/http/status.ts": "1353e82e27996ef123dc625e5fcc9d66b94d92e5175879fa5e9f0dc39330206a",
+    "https://deno.land/x/deno_cron@v1.0.0/cron.ts": "7f984d0c4c7ac4fb1ad3cd241d457e7808a9362735d910abb02dc689883ee3ef",
     "https://deno.land/x/hono@v3.10.0-rc.2/adapter/deno/serve-static.ts": "ba10cf6aaf39da942b0d49c3b9877ddba69d41d414c6551d890beb1085f58eea",
     "https://deno.land/x/hono@v3.10.0-rc.2/client/client.ts": "ff340f58041203879972dd368b011ed130c66914f789826610869a90603406bf",
     "https://deno.land/x/hono@v3.10.0-rc.2/client/index.ts": "3ff4cf246f3543f827a85a2c84d66a025ac350ee927613629bda47e854bfb7ba",
