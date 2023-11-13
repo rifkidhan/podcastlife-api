@@ -7,12 +7,12 @@ const username = Deno.env.get("DATABASE_USERNAME");
 const password = Deno.env.get("DATABASE_PASSWORD");
 
 const dialect = new PlanetScaleDialect({
-	host,
-	username,
-	password,
+  host,
+  username,
+  password,
 });
 
 export const db = new Kysely<Database>({
-	dialect,
-	plugins: [new ParseJSONResultsPlugin()],
+  dialect,
+  plugins: [new ParseJSONResultsPlugin()],
 });

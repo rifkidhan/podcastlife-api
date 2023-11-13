@@ -3,4 +3,3 @@ package.json
 pnpm-lock.yaml
 node_modules
 prisma
-deno.lock

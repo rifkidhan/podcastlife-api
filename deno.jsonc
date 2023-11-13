@@ -1,17 +1,17 @@
 {
-	"tasks": {
-		"dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
-		"start": "deno run --allow-read --allow-env --allow-net main.ts"
-	},
-	"imports": {
-		"#/": "./src/",
-		"env": "https://deno.land/std@0.200.0/dotenv/load.ts",
-		"hono": "https://deno.land/x/hono/mod.ts",
-		"hono/": "https://deno.land/x/hono/",
-		"kysely": "https://esm.sh/kysely@0.26.3",
-		"kysely-planetscale": "https://esm.sh/kysely-planetscale@1.4.0",
-		"@planetscale/database": "https://esm.sh/@planetscale/database@1.11.0",
-		"kysely-paginate": "https://esm.sh/kysely-paginate@0.2.0",
-		"http-status": "https://deno.land/std@0.206.0/http/status.ts"
-	}
+  "tasks": {
+    "dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
+    "start": "deno run --allow-read --allow-env --allow-net main.ts"
+  },
+  "imports": {
+    "#/": "./src/",
+    "env": "https://deno.land/std@0.200.0/dotenv/load.ts",
+    "hono": "https://deno.land/x/hono/mod.ts",
+    "hono/": "https://deno.land/x/hono/",
+    "kysely": "https://esm.sh/kysely@0.26.3",
+    "kysely-planetscale": "https://esm.sh/kysely-planetscale@1.4.0",
+    "@planetscale/database": "https://esm.sh/@planetscale/database@1.11.0",
+    "kysely-paginate": "https://esm.sh/kysely-paginate@0.2.0",
+    "http-status": "https://deno.land/std@0.206.0/http/status.ts"
+  }
 }
