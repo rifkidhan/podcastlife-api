@@ -1,37 +1,42 @@
-import { httpErrors, Status, RouterContext } from "oak";
-import { podcastApi } from "#/lib/podcastapi.ts";
-import { feedParser } from "#/lib/parsefeed.ts";
+import { podcastApi } from "#/controllers/podcastapi.ts";
+import { feedParser } from "#/controllers/parsefeed.ts";
+import { getPodcastByFeedId, getPodcastsByTag } from "#/controllers/podcast.ts";
+import { integer } from "#/helpers/matching.ts";
+import { Context } from "hono";
+import { Status } from "http-status";
 
 const now = Math.floor(Date.now() / 1000) - 604800;
 
-export const getPodcast = async <R extends string>(ctx: RouterContext<R>) => {
-	const { id, req } = ctx.params;
-	const res = ctx.response;
+export const getPodcastByFeedIdRoute = async (c: Context) => {
+	const id = c.req.param("feedId");
 
-	const test = "https://feeds.simplecast.com/54nAGcIl";
-	const testLive = "https://feeds.podcastindex.org/100retro.xml";
+	const data = await getPodcastByFeedId(Number(id));
+
+	if (!data) {
+		return c.notFound();
+	}
+
+	const items = await feedParser(data.url);
 
 	try {
-		// const trending = await podcastApi(`/podcasts/byfeedid?id=${id}`);
-		// if (trending) {
-		// 	const data = await trending.json();
-		// 	res.body = data;
-		// }
-		const feed = await feedParser(test);
-		if (feed) {
-			res.body = feed;
-		}
+		return c.json(
+			{
+				ok: true,
+				data,
+				liveitems: items?.podcastLiveItems,
+				episodes: items?.items,
+			},
+			Status.OK
+		);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const getTrending = async <R extends string>(ctx: RouterContext<R>) => {
-	const params = ctx.request.url.searchParams;
-	const res = ctx.response;
+export const getTrending = async (c: Context) => {
+	const { max } = c.req.query();
 
 	let maxResponse = 10;
-	const max = params.get("max");
 
 	if (max) {
 		maxResponse = Number(max);
@@ -43,10 +48,45 @@ export const getTrending = async <R extends string>(ctx: RouterContext<R>) => {
 		);
 		if (trending) {
 			const data = await trending.json();
-			res.body = data;
-			res.status = Status.OK;
-			console.log("ok");
+			return c.json({ data, ok: true }, Status.OK);
 		}
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getPodcastsByTagRoute = async (c: Context) => {
+	const { tag, limit, page } = c.req.query();
+
+	let reqLimit = 50;
+	let reqPage = 1;
+
+	if (limit && integer(limit)) {
+		reqLimit = Number(limit);
+	}
+
+	if (page && integer(page)) {
+		reqPage = Number(page);
+	}
+
+	const data = await getPodcastsByTag({ tag, limit: reqLimit, page: reqPage });
+
+	if (data.rows.length < 1) {
+		return c.notFound();
+	}
+
+	try {
+		return c.json(
+			{
+				ok: true,
+				hasNextPage: data.hasNextPage,
+				nextpage: data.hasNextPage ? reqPage + 1 : undefined,
+				hasPrevPage: data.hasPrevPage,
+				prevPage: data.hasPrevPage ? reqPage - 1 : undefined,
+				data: data.rows,
+			},
+			Status.OK
+		);
 	} catch (error) {
 		throw error;
 	}

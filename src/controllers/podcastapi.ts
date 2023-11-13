@@ -3,17 +3,13 @@ import {
 	toHashString,
 } from "https://deno.land/std@0.200.0/crypto/mod.ts";
 
-const podcastUrl = Deno.env.get("PODCAST_URL");
-const podcastKey = Deno.env.get("PODCAST_KEY");
-const podcastSecret = Deno.env.get("PODCAST_SECRET");
-const userAgent = Deno.env.get("USER_AGENT");
+const podcastUrl = Deno.env.get("PODCAST_URL") || "https://rifkidhan.my.id";
+const podcastKey = Deno.env.get("PODCAST_KEY") || "https://rifkidhan.my.id";
+const podcastSecret =
+	Deno.env.get("PODCAST_SECRET") || "https://rifkidhan.my.id";
+const userAgent = Deno.env.get("USER_AGENT") || "PodcastLife/1.0";
 
 export const podcastApi = async (req: string) => {
-	if (!podcastUrl || !podcastKey || !podcastSecret || !userAgent) {
-		console.error("Something Error in podcast env. Please check again");
-		return undefined;
-	}
-
 	const times = Math.floor(Date.now() / 1000);
 
 	const dataHash = podcastKey + podcastSecret + times;
