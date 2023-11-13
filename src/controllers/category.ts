@@ -1,6 +1,6 @@
 import { db } from "#/db/db.ts";
 import { executeWithOffsetPagination } from "kysely-paginate";
-import { groupingCategories } from "#/helpers/categoryHelpers.ts";
+import { groupingCategories } from "#/helpers/matching.ts";
 
 export const getPodcastsFromCategory = async ({
 	cat,

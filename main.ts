@@ -4,13 +4,17 @@ import { prettyJSON, bearerAuth } from "hono/middleware.ts";
 import { podcast, category } from "#/routes/routes.ts";
 import { Status } from "http-status";
 import { updateFeed } from "#/script/updateDb.ts";
-import { cron } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
+import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
+
+const job = new Cron("* */2 * * * *");
+
+job.schedule(async () => {
+	console.log("update feeds starting");
+	await updateFeed();
+	console.log("update finished");
+});
 
 const app = new Hono();
-
-cron(`1 0 */2 * * *`, async () => {
-	await updateFeed();
-});
 
 /**
  * make response json pretty
@@ -34,10 +38,10 @@ app.notFound((c) => {
  * Response for error
  */
 app.onError((err, c) => {
-	console.error(err);
 	if (err instanceof HTTPException) {
 		return err.getResponse();
 	}
+	console.error(err);
 	return c.json({ message: err.message }, Status.InternalServerError);
 });
 
