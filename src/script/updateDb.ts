@@ -2,7 +2,7 @@ import { db } from "#/db/db.ts";
 import { podcastApi } from "#/controllers/podcastapi.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { language } from "#/helpers/matching.ts";
-import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
+// import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
 
 const hour = Math.floor(Date.now() / 1000) - 7200;
 
@@ -59,15 +59,9 @@ export const updateFeed = async () => {
  */
 
 export const cronUpdate = () => {
-	const update = new Cron("1 * */2 * * *", async () => {
+	Deno.cron("update cron", "0 */2 * * *", async () => {
 		console.log("update feeds starting");
 		await updateFeed();
 		console.log("update finished");
 	});
-
-	if (update.nextRun() === null) {
-		console.log("something error in cronjob");
-	} else {
-		console.log("Job will fire at " + update.nextRun());
-	}
 };
