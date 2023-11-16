@@ -1,6 +1,10 @@
 import { podcastApi } from "#/controllers/podcastapi.ts";
 import { feedParser } from "#/controllers/parsefeed.ts";
-import { getPodcastByFeedId, getPodcastsByTag } from "#/controllers/podcast.ts";
+import {
+	getPodcastByFeedId,
+	getPodcastsByTag,
+	getPodcastUrl,
+} from "#/controllers/podcast.ts";
 import { integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { Context, HTTPException } from "hono";
@@ -28,7 +32,6 @@ export const getPodcastByFeedIdRoute = async (c: Context) => {
 	try {
 		return c.json(
 			{
-				ok: true,
 				data,
 				items,
 			},
@@ -46,16 +49,20 @@ export const getPodcastByFeedIdRoute = async (c: Context) => {
  */
 export const getPodcastInfo = async (c: Context) => {
 	const id = c.req.param("feedId");
-	const data = await getPodcastByFeedId(Number(id));
+
+	const data = await getPodcastUrl(Number(id));
 
 	if (!data) {
 		return c.notFound();
 	}
 
+	const items = await feedParser(data.url);
+
 	try {
 		return c.json(
 			{
 				data,
+				items,
 			},
 			Status.OK
 		);
