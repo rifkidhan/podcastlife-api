@@ -167,3 +167,20 @@ export const getPodcastsByTagRoute = async (c: Context) => {
 		throw error;
 	}
 };
+
+export const getLive = async (c: Context) => {
+	const { max } = c.req.query();
+	let maxItem = 50;
+
+	if (max) {
+		maxItem = Number(max);
+	}
+	const result = await podcastApi(`/episodes/live?max=${maxItem}&pretty`);
+
+	if (!result.ok) {
+		throw new HTTPException(result.status);
+	}
+
+	const data = await result.json();
+	return c.json({ data }, Status.OK);
+};

@@ -5,6 +5,7 @@ import {
 	getTrending,
 	getEpisodes,
 	getPodcastInfo,
+	getLive,
 } from "#/routes/podcasts.ts";
 import { getCategoryByName } from "#/routes/categories.ts";
 import { Status, STATUS_TEXT } from "http-status";
@@ -15,6 +16,7 @@ podcast.get("/podcast/full/:feedId", getPodcastByFeedIdRoute);
 podcast.get("/podcast/info/:feedId", getPodcastInfo);
 podcast.get("/podcast/episodes", getEpisodes);
 podcast.get("/trending", getTrending);
+podcast.get("/live", getLive);
 podcast.get("/tags", getPodcastsByTagRoute);
 podcast.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
 	throw new HTTPException(Status.MethodNotAllowed, {
