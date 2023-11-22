@@ -6,17 +6,19 @@ import { STATUS_CODE, STATUS_TEXT } from "http-status";
 
 const category = new Hono();
 
-/**
- * caches
- */
-category.get(
-	"/*",
-	cache({
-		cacheName: "category",
-		wait: true,
-		cacheControl: "max-age=172800, must-revalidate",
-	})
-);
+if (!Deno.env.get("DEV")) {
+	/**
+	 * caches
+	 */
+	category.get(
+		"/*",
+		cache({
+			cacheName: "categories",
+			wait: true,
+			cacheControl: "max-age=172800, must-revalidate",
+		})
+	);
+}
 
 /**
  * Get All Podcast from Category

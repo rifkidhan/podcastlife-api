@@ -16,26 +16,28 @@ const now = Math.floor(Date.now() / 1000) - 86400;
 
 const podcast = new Hono();
 
-/**
- * caches
- */
-podcast.get(
-	"/podcast/*",
-	cache({
-		cacheName: "podcasts",
-		wait: true,
-		cacheControl: "max-age=86400, must-revalidate",
-	})
-);
+if (!Deno.env.get("DEV")) {
+	/**
+	 * caches
+	 */
+	podcast.get(
+		"/podcast/*",
+		cache({
+			cacheName: "podcasts",
+			wait: true,
+			cacheControl: "max-age=86400, must-revalidate",
+		})
+	);
 
-podcast.get(
-	"/tags/*",
-	cache({
-		cacheName: "tags",
-		wait: true,
-		cacheControl: "max-age=172800, must-revalidate",
-	})
-);
+	podcast.get(
+		"/tags/*",
+		cache({
+			cacheName: "tags",
+			wait: true,
+			cacheControl: "max-age=172800, must-revalidate",
+		})
+	);
+}
 
 /**
  * Get Full info from database and parser
