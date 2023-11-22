@@ -1,8 +1,5 @@
 import { db } from "#/db/db.ts";
-import {
-	executeWithOffsetPagination,
-	executeWithCursorPagination,
-} from "kysely-paginate";
+import { executeWithCursorPagination } from "kysely-paginate";
 
 /**
  * get podcast info from database

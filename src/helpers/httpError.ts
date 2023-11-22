@@ -1,13 +1,13 @@
-import { ErrorStatus, Status } from "http-status";
+import { ErrorStatus, STATUS_CODE } from "http-status";
 import { HTTPException } from "hono";
 
-export const errorPodcastApi = (status: ErrorStatus) => {
-  let message = "invalid parameter from PodcastIndex";
-  if (status === Status.Unauthorized) {
-    message = "invalid authorization from podcastindex";
+export const errorPodcastApi = (status: ErrorStatus | number) => {
+	let message = "invalid parameter from PodcastIndex";
+	if (status === STATUS_CODE.Unauthorized) {
+		message = "invalid authorization from podcastindex";
 
-    throw new HTTPException(Status.InternalServerError, { message });
-  }
+		throw new HTTPException(STATUS_CODE.InternalServerError, { message });
+	}
 
-  throw new HTTPException(Status.InternalServerError, { message });
+	throw new HTTPException(STATUS_CODE.InternalServerError, { message });
 };

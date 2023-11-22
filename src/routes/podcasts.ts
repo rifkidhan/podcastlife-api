@@ -9,7 +9,7 @@ import { integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { HTTPException, Hono } from "hono";
 import { cache } from "hono/middleware.ts";
-import { Status, STATUS_TEXT } from "http-status";
+import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { groupingCategories } from "#/helpers/matching.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
@@ -57,7 +57,7 @@ podcast.get("/podcast/full/:feedId", async (c) => {
 				data,
 				items,
 			},
-			Status.OK
+			STATUS_CODE.OK
 		);
 	} catch (error) {
 		throw error;
@@ -84,7 +84,7 @@ podcast.get("/podcast/info/:feedId", async (c) => {
 				data,
 				items,
 			},
-			Status.OK
+			STATUS_CODE.OK
 		);
 	} catch (error) {
 		throw error;
@@ -99,8 +99,8 @@ podcast.get("/podcast/episodes/:url", async (c) => {
 	const { url } = c.req.param();
 
 	if (!url) {
-		throw new HTTPException(Status.BadRequest, {
-			message: STATUS_TEXT[Status.BadRequest],
+		throw new HTTPException(STATUS_CODE.BadRequest, {
+			message: STATUS_TEXT[STATUS_CODE.BadRequest],
 		});
 	}
 
@@ -112,7 +112,7 @@ podcast.get("/podcast/episodes/:url", async (c) => {
 				liveitems: items?.podcastLiveItems,
 				episodes: items?.items,
 			},
-			Status.OK
+			STATUS_CODE.OK
 		);
 	} catch (error) {
 		throw error;
@@ -152,7 +152,7 @@ podcast.get("/trending", async (c) => {
 		const trending = await podcastApi(url);
 		if (trending.ok) {
 			const data = await trending.json();
-			return c.json({ data }, Status.OK);
+			return c.json({ data }, STATUS_CODE.OK);
 		}
 		errorPodcastApi(trending.status);
 	} catch (error) {
@@ -187,7 +187,7 @@ podcast.get("/tags/:tag", async (c) => {
 				endCursor: data.endCursor,
 				data: data.rows,
 			},
-			Status.OK
+			STATUS_CODE.OK
 		);
 	} catch (error) {
 		throw error;
@@ -211,15 +211,15 @@ podcast.get("/live", async (c) => {
 	}
 
 	const data = await result.json();
-	return c.json({ data }, Status.OK);
+	return c.json({ data }, STATUS_CODE.OK);
 });
 
 /**
  * Decline method
  */
 podcast.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
-	throw new HTTPException(Status.MethodNotAllowed, {
-		message: STATUS_TEXT[Status.MethodNotAllowed],
+	throw new HTTPException(STATUS_CODE.MethodNotAllowed, {
+		message: STATUS_TEXT[STATUS_CODE.MethodNotAllowed],
 	});
 });
 

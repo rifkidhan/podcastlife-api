@@ -1,30 +1,30 @@
 import { createMiddleware } from "hono/helper.ts";
 import { HTTPException } from "hono";
-import { isErrorStatus, Status, STATUS_TEXT } from "http-status";
+import { isErrorStatus, STATUS_CODE, STATUS_TEXT } from "http-status";
 
 export const errorHandler = createMiddleware(async (_c, next) => {
-  try {
-    await next();
-  } catch (error) {
-    if (isErrorStatus(error.status)) {
-      if (error.status === Status.Unauthorized) {
-        throw new HTTPException(Status.Unauthorized, {
-          message: STATUS_TEXT[Status.Unauthorized],
-        });
-      }
-      if (error.status === Status.BadGateway) {
-        throw new HTTPException(Status.BadGateway, {
-          message: STATUS_TEXT[Status.BadGateway],
-        });
-      }
-      if (error.status === Status.BadRequest) {
-        throw new HTTPException(Status.BadGateway, {
-          message: STATUS_TEXT[Status.BadGateway],
-        });
-      }
-    }
-    throw new HTTPException(Status.InternalServerError, {
-      message: STATUS_TEXT[Status.InternalServerError],
-    });
-  }
+	try {
+		await next();
+	} catch (error) {
+		if (isErrorStatus(error.status)) {
+			if (error.status === STATUS_CODE.Unauthorized) {
+				throw new HTTPException(STATUS_CODE.Unauthorized, {
+					message: STATUS_TEXT[STATUS_CODE.Unauthorized],
+				});
+			}
+			if (error.status === STATUS_CODE.BadGateway) {
+				throw new HTTPException(STATUS_CODE.BadGateway, {
+					message: STATUS_TEXT[STATUS_CODE.BadGateway],
+				});
+			}
+			if (error.status === STATUS_CODE.BadRequest) {
+				throw new HTTPException(STATUS_CODE.BadGateway, {
+					message: STATUS_TEXT[STATUS_CODE.BadGateway],
+				});
+			}
+		}
+		throw new HTTPException(STATUS_CODE.InternalServerError, {
+			message: STATUS_TEXT[STATUS_CODE.InternalServerError],
+		});
+	}
 });

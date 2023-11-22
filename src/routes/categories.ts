@@ -2,7 +2,7 @@ import { Hono, HTTPException } from "hono";
 import { cache } from "hono/middleware.ts";
 import { getPodcastsFromCategory } from "#/models/category.ts";
 import { integer } from "#/helpers/matching.ts";
-import { Status, STATUS_TEXT } from "http-status";
+import { STATUS_CODE, STATUS_TEXT } from "http-status";
 
 const category = new Hono();
 
@@ -50,7 +50,7 @@ category.get("/:categoryName", async (c) => {
 				endCursor: data.endCursor,
 				data: data.rows,
 			},
-			Status.OK
+			STATUS_CODE.OK
 		);
 	} catch (error) {
 		throw error;
@@ -61,8 +61,8 @@ category.get("/:categoryName", async (c) => {
  * Decline method
  */
 category.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
-	throw new HTTPException(Status.MethodNotAllowed, {
-		message: STATUS_TEXT[Status.MethodNotAllowed],
+	throw new HTTPException(STATUS_CODE.MethodNotAllowed, {
+		message: STATUS_TEXT[STATUS_CODE.MethodNotAllowed],
 	});
 });
 
