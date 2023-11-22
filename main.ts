@@ -1,7 +1,8 @@
 import "env";
 import { Hono, HTTPException } from "hono";
-import { bearerAuth, prettyJSON } from "hono/middleware.ts";
-import { category, podcast } from "#/routes/routes.ts";
+import { bearerAuth, prettyJSON, cache } from "hono/middleware.ts";
+import category from "#/routes/categories.ts";
+import podcast from "#/routes/podcasts.ts";
 import { Status } from "http-status";
 import { cronUpdate } from "#/script/updateDb.ts";
 
@@ -38,8 +39,15 @@ app.onError((err, c) => {
 	return c.json({ message: err.message }, Status.InternalServerError);
 });
 
-app.get("/");
-app.get("/", (c) => c.text("Podcastlife Api"));
+app.get(
+	"/",
+	(c) => c.text("Podcastlife Api"),
+	cache({
+		cacheName: "home",
+		wait: true,
+		cacheControl: "max-age=604800, must-revalidate",
+	})
+);
 
 app.route("/api/podcasts", podcast);
 app.route("/api/categories", category);

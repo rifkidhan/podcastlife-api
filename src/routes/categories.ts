@@ -1,9 +1,15 @@
-import { Context } from "hono";
-import { getPodcastsFromCategory } from "#/controllers/category.ts";
+import { Hono, HTTPException } from "hono";
+import { cache } from "hono/middleware.ts";
+import { getPodcastsFromCategory } from "#/models/category.ts";
 import { integer } from "#/helpers/matching.ts";
-import { Status } from "http-status";
+import { Status, STATUS_TEXT } from "http-status";
 
-export const getCategoryByName = async (c: Context) => {
+const category = new Hono();
+
+/**
+ * Get All Podcast from Category
+ */
+category.get("/:categoryName", async (c) => {
 	const cat = c.req.param("categoryName");
 	const { perPage, after, before } = c.req.query();
 
@@ -37,4 +43,23 @@ export const getCategoryByName = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
+category.get(
+	"/*",
+	cache({
+		cacheName: "tags",
+		wait: true,
+		cacheControl: "max-age=172800, must-revalidate",
+	})
+);
+
+/**
+ * Decline method
+ */
+category.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
+	throw new HTTPException(Status.MethodNotAllowed, {
+		message: STATUS_TEXT[Status.MethodNotAllowed],
+	});
+});
+
+export default category;

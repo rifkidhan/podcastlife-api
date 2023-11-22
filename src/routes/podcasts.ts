@@ -1,24 +1,25 @@
-import { podcastApi } from "#/controllers/podcastapi.ts";
-import { feedParser } from "#/controllers/parsefeed.ts";
+import { podcastApi } from "#/models/podcastapi.ts";
+import { feedParser } from "#/models/parsefeed.ts";
 import {
 	getPodcastByFeedId,
 	getPodcastsByTag,
 	getPodcastUrl,
-} from "#/controllers/podcast.ts";
+} from "#/models/podcast.ts";
 import { integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
-import { Context, HTTPException } from "hono";
+import { HTTPException, Hono } from "hono";
+import { cache } from "hono/middleware.ts";
 import { Status, STATUS_TEXT } from "http-status";
 import { groupingCategories } from "#/helpers/matching.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
+const podcast = new Hono();
+
 /**
- * Get Full podcast
- * @param {Context} c
- * @returns Promise<Response>
+ * Get Full info from database and parser
  */
-export const getPodcastByFeedIdRoute = async (c: Context) => {
+podcast.get("/podcast/full/:feedId", async (c) => {
 	const id = c.req.param("feedId");
 
 	const data = await getPodcastByFeedId(Number(id));
@@ -40,14 +41,12 @@ export const getPodcastByFeedIdRoute = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
 
 /**
- * Get only podcast infor
- * @param {Context} c
- * @returns Promise<Response>
+ * Get podcast url and full info from parser
  */
-export const getPodcastInfo = async (c: Context) => {
+podcast.get("/podcast/info/:feedId", async (c) => {
 	const id = c.req.param("feedId");
 
 	const data = await getPodcastUrl(Number(id));
@@ -69,10 +68,14 @@ export const getPodcastInfo = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
 
-export const getEpisodes = async (c: Context) => {
-	const { url } = c.req.query();
+/**
+ * Get Episodes from request url
+ */
+
+podcast.get("/podcast/episodes/:url", async (c) => {
+	const { url } = c.req.param();
 
 	if (!url) {
 		throw new HTTPException(Status.BadRequest, {
@@ -93,9 +96,21 @@ export const getEpisodes = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
+podcast.get(
+	"/podcast/*",
+	cache({
+		cacheName: "episodes",
+		wait: true,
+		cacheControl: "max-age=86400, must-revalidate",
+	})
+);
 
-export const getTrending = async (c: Context) => {
+/**
+ * Get trending podcast from podcastindex
+ */
+
+podcast.get("/trending", async (c) => {
 	const { max, cat } = c.req.query();
 
 	let maxResponse = 10;
@@ -130,10 +145,14 @@ export const getTrending = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
 
-export const getPodcastsByTagRoute = async (c: Context) => {
-	const { perPage, after, before, tag } = c.req.query();
+/**
+ * Get All podcast from tags
+ */
+podcast.get("/tags/:tag", async (c) => {
+	const { tag } = c.req.param();
+	const { perPage, after, before } = c.req.query();
 
 	let reqPage = 50;
 
@@ -160,9 +179,20 @@ export const getPodcastsByTagRoute = async (c: Context) => {
 	} catch (error) {
 		throw error;
 	}
-};
+});
+podcast.get(
+	"/tags/*",
+	cache({
+		cacheName: "tags",
+		wait: true,
+		cacheControl: "max-age=172800, must-revalidate",
+	})
+);
 
-export const getLive = async (c: Context) => {
+/**
+ * Get live podcast from podcastindex
+ */
+podcast.get("/live", async (c) => {
 	const { max } = c.req.query();
 	let maxItem = 50;
 
@@ -177,4 +207,15 @@ export const getLive = async (c: Context) => {
 
 	const data = await result.json();
 	return c.json({ data }, Status.OK);
-};
+});
+
+/**
+ * Decline method
+ */
+podcast.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
+	throw new HTTPException(Status.MethodNotAllowed, {
+		message: STATUS_TEXT[Status.MethodNotAllowed],
+	});
+});
+
+export default podcast;
