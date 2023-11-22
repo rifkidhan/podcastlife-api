@@ -17,6 +17,27 @@ const now = Math.floor(Date.now() / 1000) - 86400;
 const podcast = new Hono();
 
 /**
+ * caches
+ */
+podcast.get(
+	"/podcast/*",
+	cache({
+		cacheName: "podcasts",
+		wait: true,
+		cacheControl: "max-age=86400, must-revalidate",
+	})
+);
+
+podcast.get(
+	"/tags/*",
+	cache({
+		cacheName: "tags",
+		wait: true,
+		cacheControl: "max-age=172800, must-revalidate",
+	})
+);
+
+/**
  * Get Full info from database and parser
  */
 podcast.get("/podcast/full/:feedId", async (c) => {
@@ -97,14 +118,6 @@ podcast.get("/podcast/episodes/:url", async (c) => {
 		throw error;
 	}
 });
-podcast.get(
-	"/podcast/*",
-	cache({
-		cacheName: "episodes",
-		wait: true,
-		cacheControl: "max-age=86400, must-revalidate",
-	})
-);
 
 /**
  * Get trending podcast from podcastindex
@@ -180,14 +193,6 @@ podcast.get("/tags/:tag", async (c) => {
 		throw error;
 	}
 });
-podcast.get(
-	"/tags/*",
-	cache({
-		cacheName: "tags",
-		wait: true,
-		cacheControl: "max-age=172800, must-revalidate",
-	})
-);
 
 /**
  * Get live podcast from podcastindex

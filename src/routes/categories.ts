@@ -7,6 +7,18 @@ import { Status, STATUS_TEXT } from "http-status";
 const category = new Hono();
 
 /**
+ * caches
+ */
+category.get(
+	"/*",
+	cache({
+		cacheName: "category",
+		wait: true,
+		cacheControl: "max-age=172800, must-revalidate",
+	})
+);
+
+/**
  * Get All Podcast from Category
  */
 category.get("/:categoryName", async (c) => {
@@ -44,14 +56,6 @@ category.get("/:categoryName", async (c) => {
 		throw error;
 	}
 });
-category.get(
-	"/*",
-	cache({
-		cacheName: "tags",
-		wait: true,
-		cacheControl: "max-age=172800, must-revalidate",
-	})
-);
 
 /**
  * Decline method
