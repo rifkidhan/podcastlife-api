@@ -5,23 +5,19 @@ import { Status } from "http-status";
 
 export const getCategoryByName = async (c: Context) => {
 	const cat = c.req.param("categoryName");
-	const { limit, page } = c.req.query();
+	const { perPage, after, before } = c.req.query();
 
-	let reqLimit = 50;
-	let reqPage = 1;
+	let reqPage = 50;
 
-	if (limit && integer(limit)) {
-		reqLimit = Number(limit);
-	}
-
-	if (page && integer(page)) {
-		reqPage = Number(page);
+	if (perPage && integer(perPage)) {
+		reqPage = Number(perPage);
 	}
 
 	const data = await getPodcastsFromCategory({
 		cat,
-		limit: reqLimit,
-		page: reqPage,
+		after,
+		before,
+		perPage: reqPage,
 	});
 
 	if (!data || data.rows.length < 1) {
@@ -32,9 +28,8 @@ export const getCategoryByName = async (c: Context) => {
 		return c.json(
 			{
 				hasNextPage: data.hasNextPage,
-				nextpage: data.hasNextPage ? reqPage + 1 : undefined,
-				hasPrevPage: data.hasPrevPage,
-				prevPage: data.hasPrevPage ? reqPage - 1 : undefined,
+				startCursor: data.startCursor,
+				endCursor: data.endCursor,
 				data: data.rows,
 			},
 			Status.OK

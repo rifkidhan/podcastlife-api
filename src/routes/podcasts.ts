@@ -133,20 +133,15 @@ export const getTrending = async (c: Context) => {
 };
 
 export const getPodcastsByTagRoute = async (c: Context) => {
-	const { tag, limit, page } = c.req.query();
+	const { perPage, after, before, tag } = c.req.query();
 
-	let reqLimit = 50;
-	let reqPage = 1;
+	let reqPage = 50;
 
-	if (limit && integer(limit)) {
-		reqLimit = Number(limit);
+	if (perPage && integer(perPage)) {
+		reqPage = Number(perPage);
 	}
 
-	if (page && integer(page)) {
-		reqPage = Number(page);
-	}
-
-	const data = await getPodcastsByTag({ tag, limit: reqLimit, page: reqPage });
+	const data = await getPodcastsByTag({ tag, after, before, perPage: reqPage });
 
 	if (data.rows.length < 1) {
 		return c.notFound();
@@ -156,9 +151,8 @@ export const getPodcastsByTagRoute = async (c: Context) => {
 		return c.json(
 			{
 				hasNextPage: data.hasNextPage,
-				nextpage: data.hasNextPage ? reqPage + 1 : undefined,
-				hasPrevPage: data.hasPrevPage,
-				prevPage: data.hasPrevPage ? reqPage - 1 : undefined,
+				startCursor: data.startCursor,
+				endCursor: data.endCursor,
 				data: data.rows,
 			},
 			Status.OK

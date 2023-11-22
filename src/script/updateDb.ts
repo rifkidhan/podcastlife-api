@@ -165,9 +165,10 @@ export const fromBucket = async () => {
  */
 
 export const cronUpdate = () => {
-	new Cron("@daily", { name: "update" }, async () => {
+	const jobs = new Cron("@daily", { name: "update" }, async () => {
 		console.log(`update feeds starting`);
 		await fromBucket();
 		console.log("update finished");
 	});
+	console.log("next cron update: ", jobs.nextRun()?.toLocaleString());
 };

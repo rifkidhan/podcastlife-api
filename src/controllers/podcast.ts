@@ -1,5 +1,8 @@
 import { db } from "#/db/db.ts";
-import { executeWithOffsetPagination } from "kysely-paginate";
+import {
+	executeWithOffsetPagination,
+	executeWithCursorPagination,
+} from "kysely-paginate";
 
 /**
  * get podcast info from database
@@ -11,7 +14,6 @@ export const getPodcastByFeedId = async (id: number) => {
 		.selectFrom("Podcast")
 		.selectAll()
 		.where("Podcast.feedId", "=", id)
-		.limit(1)
 		.executeTakeFirst();
 
 	return data;
@@ -22,7 +24,6 @@ export const getPodcastUrl = async (id: number) => {
 		.selectFrom("Podcast")
 		.select(["feedId", "url", "originalUrl", "link", "title"])
 		.where("Podcast.feedId", "=", id)
-		.limit(1)
 		.executeTakeFirst();
 
 	return data;
@@ -36,22 +37,25 @@ export const getPodcastUrl = async (id: number) => {
  */
 export const getPodcastsByTag = async ({
 	tag,
-	limit = 50,
-	page = 1,
+	perPage = 50,
+	before,
+	after,
 }: {
 	tag: string;
-	page?: number;
-	limit?: number;
+	perPage?: number;
+	before?: string;
+	after?: string;
 }) => {
 	const data = db
 		.selectFrom("Podcast")
 		.select([
-			"Podcast.feedId",
-			"Podcast.title",
-			"Podcast.description",
-			"Podcast.imageUrl",
-			"Podcast.author",
-			"Podcast.newestItemPublishTime",
+			"feedId",
+			"title",
+			"author",
+			"ownerName",
+			"explicit",
+			"imageUrl",
+			"newestItemPublishTime",
 		])
 		.where((eb) =>
 			eb.or({
@@ -64,12 +68,23 @@ export const getPodcastsByTag = async ({
 				tag7: eb.ref("tag1"),
 				tag8: eb.ref("tag1"),
 			})
-		)
-		.orderBy("Podcast.newestItemPublishTime", "desc");
+		);
 
-	const result = await executeWithOffsetPagination(data, {
-		perPage: limit,
-		page,
+	const result = await executeWithCursorPagination(data, {
+		perPage,
+		before,
+		after,
+		fields: [
+			{ expression: "newestItemPublishTime", direction: "desc" },
+			{
+				expression: "feedId",
+				direction: "asc",
+			},
+		],
+		parseCursor: (cursor) => ({
+			newestItemPublishTime: cursor.newestItemPublishTime,
+			feedId: parseInt(cursor.feedId, 10),
+		}),
 	});
 
 	return result;
