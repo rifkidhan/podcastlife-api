@@ -1,24 +1,9 @@
 import { Hono, HTTPException } from "hono";
-import { cache } from "hono/middleware.ts";
 import { getPodcastsFromCategory } from "#/models/category.ts";
 import { integer } from "#/helpers/matching.ts";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 
 const category = new Hono();
-
-if (!Deno.env.get("DEV")) {
-	/**
-	 * caches
-	 */
-	category.get(
-		"/*",
-		cache({
-			cacheName: "categories",
-			wait: true,
-			cacheControl: "max-age=172800, must-revalidate",
-		})
-	);
-}
 
 /**
  * Get All Podcast from Category

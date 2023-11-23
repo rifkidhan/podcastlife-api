@@ -8,36 +8,12 @@ import {
 import { integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { HTTPException, Hono } from "hono";
-import { cache } from "hono/middleware.ts";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { groupingCategories } from "#/helpers/matching.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
 const podcast = new Hono();
-
-if (!Deno.env.get("DEV")) {
-	/**
-	 * caches
-	 */
-	podcast.get(
-		"/podcast/*",
-		cache({
-			cacheName: "podcasts",
-			wait: true,
-			cacheControl: "max-age=86400, must-revalidate",
-		})
-	);
-
-	podcast.get(
-		"/tags/*",
-		cache({
-			cacheName: "tags",
-			wait: true,
-			cacheControl: "max-age=172800, must-revalidate",
-		})
-	);
-}
 
 /**
  * Get Full info from database and parser
