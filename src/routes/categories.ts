@@ -7,12 +7,12 @@ import { logs } from "#/middlerwares/log.ts";
 
 const category = new Hono();
 
-category.get(
-	"/*",
-	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-	})
-);
+// category.get(
+// 	"/*",
+// 	cache({
+// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+// 	})
+// );
 
 /**
  * Get All Podcast from Category

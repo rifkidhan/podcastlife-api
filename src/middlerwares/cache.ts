@@ -21,7 +21,7 @@ export const cache = (options: {
 			}
 			addHeader(c.res);
 			const response = c.res.clone();
-			await cachest.put(c.req.raw, response);
+			await cachest.put(c.req.url, response);
 		} else {
 			return new Response(response.body, response);
 		}

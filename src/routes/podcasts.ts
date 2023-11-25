@@ -17,19 +17,19 @@ const now = Math.floor(Date.now() / 1000) - 86400;
 
 const podcast = new Hono();
 
-podcast.get(
-	"/podcast/*",
-	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-	})
-);
+// podcast.get(
+// 	"/podcast/*",
+// 	cache({
+// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+// 	})
+// );
 
-podcast.get(
-	"/tags/*",
-	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-	})
-);
+// podcast.get(
+// 	"/tags/*",
+// 	cache({
+// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+// 	})
+// );
 /**
  * Get Full info from database and parser
  */

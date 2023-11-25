@@ -45,24 +45,7 @@ export const cachest = {
 		await this.put(new Request(req), await fetch(req));
 	},
 
-	async put(req: Request, res: Response) {
-		if (!res.ok) {
-			throw new TypeError(`Cannot cache response with status ${res.status}`);
-		}
-		if (req.method !== "GET") {
-			throw new TypeError(`Cannot cache response to ${req.method} request`);
-		}
-
-		if (res.status === 206) {
-			throw new TypeError(
-				"Cannot cache response to a range request (206 Partial Content)."
-			);
-		}
-
-		if (res.headers.get("vary")?.includes("*")) {
-			throw new TypeError("Cannot cache response with 'Vary: *' header.");
-		}
-
+	async put(req: RequestInfo, res: Response) {
 		const metadata: CacheMetadata = {
 			status: res.status,
 			headers: [...res.headers],
@@ -71,7 +54,7 @@ export const cachest = {
 
 		const body = res.body as ReadableStream<Uint8Array>;
 
-		await store.put(key(req.url), body, JSON.stringify(metadata));
+		await store.put(key(req as string), body, JSON.stringify(metadata));
 	},
 	async match(req: RequestInfo) {
 		let url: string;
