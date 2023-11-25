@@ -14,6 +14,7 @@ export const cache = (options: {
 		const response = await cachest.match(key);
 
 		if (!response) {
+			console.log("cachest not match");
 			await next();
 			if (!c.res.ok) {
 				return;

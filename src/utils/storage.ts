@@ -16,10 +16,8 @@ const store = {
 		data: ReadableStream<Uint8Array>,
 		metadataBody: string
 	) {
-		const body = s3.putObject(key, data);
-		const metadata = s3.putObject("meta-" + key, metadataBody);
-
-		await Promise.all([body, metadata]);
+		await s3.putObject(key, data);
+		await s3.putObject("meta-" + key, metadataBody);
 	},
 	async get(key: string) {
 		const checkDataExist = await s3.exists(key);
@@ -28,21 +26,17 @@ const store = {
 			return undefined;
 		}
 
-		const loadData = s3.getObject(key);
-		const loadMetadata = s3.getObject("meta-" + key);
-
-		const [data, metadata] = await Promise.all([loadData, loadMetadata]);
+		const loadData = await s3.getObject(key);
+		const loadMetadata = await s3.getObject("meta-" + key);
 
 		return {
-			data,
-			metadata: await metadata.text(),
+			data: loadData,
+			metadata: await loadMetadata.text(),
 		};
 	},
 	async delete(key: string) {
-		const loadData = s3.deleteObject(key);
-		const loadMetadata = s3.deleteObject("meta-" + key);
-
-		await Promise.all([loadData, loadMetadata]);
+		await s3.deleteObject(key);
+		await s3.deleteObject("meta-" + key);
 	},
 };
 
