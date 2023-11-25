@@ -10,11 +10,26 @@ import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { HTTPException, Hono } from "hono";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { groupingCategories } from "#/helpers/matching.ts";
+import { cache } from "#/middlerwares/cache.ts";
+import { logs } from "#/middlerwares/log.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
 const podcast = new Hono();
 
+podcast.get(
+	"/podcast/*",
+	cache({
+		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+	})
+);
+
+podcast.get(
+	"/tags/*",
+	cache({
+		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+	})
+);
 /**
  * Get Full info from database and parser
  */
@@ -30,6 +45,7 @@ podcast.get("/podcast/full/:feedId", async (c) => {
 	const items = await feedParser(data.url);
 
 	try {
+		logs("get full podcast data from : ", id);
 		return c.json(
 			{
 				data,
@@ -57,6 +73,7 @@ podcast.get("/podcast/info/:feedId", async (c) => {
 	const items = await feedParser(data.url);
 
 	try {
+		logs("get info podcast data from : ", id);
 		return c.json(
 			{
 				data,
@@ -73,8 +90,8 @@ podcast.get("/podcast/info/:feedId", async (c) => {
  * Get Episodes from request url
  */
 
-podcast.get("/podcast/episodes/:url", async (c) => {
-	const { url } = c.req.param();
+podcast.post("/podcast/episodes", async (c) => {
+	const { url } = await c.req.json();
 
 	if (!url) {
 		throw new HTTPException(STATUS_CODE.BadRequest, {
@@ -85,6 +102,7 @@ podcast.get("/podcast/episodes/:url", async (c) => {
 	const items = await feedParser(url);
 
 	try {
+		logs("get episodes url data from : ", url);
 		return c.json(
 			{
 				liveitems: items?.podcastLiveItems,
@@ -195,7 +213,7 @@ podcast.get("/live", async (c) => {
 /**
  * Decline method
  */
-podcast.on(["PUT", "DELETE", "POST", "OPTIONS", "PATCH"], "/*", () => {
+podcast.on(["PUT", "DELETE", "OPTIONS", "PATCH"], "/*", () => {
 	throw new HTTPException(STATUS_CODE.MethodNotAllowed, {
 		message: STATUS_TEXT[STATUS_CODE.MethodNotAllowed],
 	});

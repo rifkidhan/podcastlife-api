@@ -12,6 +12,7 @@
 		"kysely-planetscale": "https://esm.sh/kysely-planetscale@1.4.0",
 		"@planetscale/database": "https://esm.sh/@planetscale/database@1.11.0",
 		"kysely-paginate": "https://esm.sh/kysely-paginate@0.2.0",
-		"http-status": "https://deno.land/std@0.207.0/http/status.ts"
+		"http-status": "https://deno.land/std@0.207.0/http/status.ts",
+		"unstorage": "npm:unstorage"
 	}
 }

@@ -116,7 +116,7 @@ export const fromBucket = async () => {
  */
 export const cronUpdate = () => {
 	const jobs = new Cron(
-		"@daily",
+		"0 0 1 * * *",
 		{ name: "update podcast", timezone: "Asia/Jakarta" },
 		async () => {
 			console.log(`update feeds starting`);
