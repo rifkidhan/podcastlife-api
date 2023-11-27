@@ -2,17 +2,17 @@ import { Hono, HTTPException } from "hono";
 import { getPodcastsFromCategory } from "#/models/category.ts";
 import { integer } from "#/helpers/matching.ts";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
-import { cache } from "#/middlerwares/cache.ts";
 import { logs } from "#/middlerwares/log.ts";
+import { cache } from "#/middlerwares/cache.ts";
 
 const category = new Hono();
 
-// category.get(
-// 	"/*",
-// 	cache({
-// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-// 	})
-// );
+category.get(
+	"/categories/*",
+	cache({
+		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+	})
+);
 
 /**
  * Get All Podcast from Category

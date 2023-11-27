@@ -1,11 +1,11 @@
-import { parseFeed } from "https://esm.sh/podcast-partytime@4.7.0";
+import { parseFeed } from "podcast-partytime";
 
 const userAgent = Deno.env.get("USER_AGENT");
 
 export const feedParser = async (url: string) => {
 	if (!userAgent) {
 		console.error("Please make sure to set user agent in .env");
-		return undefined;
+		return null;
 	}
 	const res = await fetch(url, {
 		headers: {

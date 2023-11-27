@@ -1,5 +1,6 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { feedParser } from "#/models/parsefeed.ts";
+import { FeedObject } from "podcast-partytime";
 import {
 	getPodcastByFeedId,
 	getPodcastsByTag,
@@ -10,26 +11,28 @@ import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { HTTPException, Hono } from "hono";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { groupingCategories } from "#/helpers/matching.ts";
-import { cache } from "#/middlerwares/cache.ts";
 import { logs } from "#/middlerwares/log.ts";
+import { PodcastLiveStream } from "#/types.ts";
+import { getLiveItem } from "#/helpers/live.ts";
+import { cache } from "#/middlerwares/cache.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
 const podcast = new Hono();
 
-// podcast.get(
-// 	"/podcast/*",
-// 	cache({
-// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-// 	})
-// );
+podcast.get(
+	"/podcast/*",
+	cache({
+		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+	})
+);
 
-// podcast.get(
-// 	"/tags/*",
-// 	cache({
-// 		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
-// 	})
-// );
+podcast.get(
+	"/tags/*",
+	cache({
+		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+	})
+);
 /**
  * Get Full info from database and parser
  */
@@ -191,23 +194,51 @@ podcast.get("/tags/:tag", async (c) => {
 });
 
 /**
- * Get live podcast from podcastindex
+ * Get live podcast
  */
 podcast.get("/live", async (c) => {
-	const { max } = c.req.query();
-	let maxItem = 50;
-
-	if (max) {
-		maxItem = Number(max);
-	}
-	const result = await podcastApi(`/episodes/live?max=${maxItem}&pretty`);
+	/**
+	 * get live items from podcastindex only en & in
+	 */
+	const result = await podcastApi(`/episodes/live?max=100&pretty`);
 
 	if (!result.ok) {
 		throw new HTTPException(result.status);
 	}
 
-	const data = await result.json();
-	return c.json({ data }, STATUS_CODE.OK);
+	const items = await result.json().then((res) => res.items);
+
+	const fromIndex: PodcastLiveStream[] = [];
+	const idx = new Set();
+
+	const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
+		const isDuplicate = idx.has(obj.feedId);
+
+		idx.add(obj.feedId);
+
+		if (!isDuplicate) {
+			return true;
+		}
+
+		return false;
+	});
+
+	for (const index of liveFromPodcastIndex) {
+		if (index.feedLanguage.includes("en" || "in")) {
+			fromIndex.push(index);
+		}
+	}
+
+	const live: FeedObject["podcastLiveItems"] = [];
+
+	for (const items of fromIndex) {
+		const liveItems = await getLiveItem(items.feedId);
+		if (liveItems) {
+			liveItems.map((item) => live.push(item));
+		}
+	}
+
+	return c.json({ items: live }, STATUS_CODE.OK);
 });
 
 /**

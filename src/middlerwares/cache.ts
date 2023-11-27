@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-import { cachest } from "#/utils/storage.ts";
+import cachest from "#/utils/cache-provider.ts";
 
 export const cache = (options: {
 	cacheControl?: string;
@@ -9,9 +9,12 @@ export const cache = (options: {
 			response.headers.set("Cache-Control", options.cacheControl);
 	};
 
+	const provider = cachest();
+
 	return async (c, next) => {
 		const key = c.req.url;
-		const response = await cachest.match(key);
+		// const response = await cachest.match(key);
+		const response = await provider.get(key);
 
 		if (!response) {
 			console.log("cachest not match");
@@ -21,8 +24,9 @@ export const cache = (options: {
 			}
 			addHeader(c.res);
 			const response = c.res.clone();
-			await cachest.put(c.req.url, response);
+			provider.set(c.req.url, response);
 		} else {
+			console.log("cachest match");
 			return new Response(response.body, response);
 		}
 	};

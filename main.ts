@@ -4,12 +4,23 @@ import { bearerAuth, prettyJSON, compress, logger } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
-import { cronUpdate } from "#/script/updateDb.ts";
+import { cronUpdate, fromBucket } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
+import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
 
 const app = new Hono();
 
-cronUpdate();
+// cronUpdate();
+
+new Cron(
+	"0 0 1 * * *",
+	{ name: "update podcast", timezone: "Asia/Jakarta" },
+	async () => {
+		console.log(`update feeds starting`);
+		await fromBucket();
+		console.log("update finished");
+	}
+);
 
 /**
  * make response json pretty
