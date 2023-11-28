@@ -4,7 +4,7 @@ import { bearerAuth, prettyJSON, compress, logger } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
-import { cronUpdate, fromBucket } from "#/script/updateDb.ts";
+import { fromBucket } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
 
@@ -59,4 +59,5 @@ app.get("/", (c) => c.text("Podcastlife Api"));
 app.route("/v1/podcasts", podcast);
 app.route("/v1/categories", category);
 
+console.log("Podcastlife API");
 Deno.serve(app.fetch);

@@ -1,5 +1,4 @@
-import { Episode, FeedObject } from "podcast-partytime";
-import { PodcastLiveStream } from "#/types.ts";
+import { Episode } from "https://esm.sh/podcast-partytime@4.7.0";
 import { getPodcastUrl } from "#/models/podcast.ts";
 import { feedParser } from "#/models/parsefeed.ts";
 
@@ -51,7 +50,6 @@ export const getLiveItem = async (id: number) => {
 
 	for (const item of liveStream) {
 		if (item.image === "" || typeof item.image === "undefined") {
-			// live.add({ ...item, image: feed.image?.url });
 			liveItems.push({
 				...item,
 				image: feed.image?.url,
@@ -59,7 +57,6 @@ export const getLiveItem = async (id: number) => {
 				feedId: id,
 			});
 		} else {
-			// live.add(item);
 			liveItems.push({ ...item, feedTitle: feed.title, feedId: id });
 		}
 	}

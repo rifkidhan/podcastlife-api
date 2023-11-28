@@ -46,8 +46,6 @@ const cachest = () => {
 
 			const miss = age > maxAge + swr;
 
-			console.log(maxAge, swr, age, miss);
-
 			if (miss) {
 				console.log("expired cache");
 				provider.delete(key);

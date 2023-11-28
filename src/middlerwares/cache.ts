@@ -13,11 +13,10 @@ export const cache = (options: {
 
 	return async (c, next) => {
 		const key = c.req.url;
-		// const response = await cachest.match(key);
+
 		const response = await provider.get(key);
 
 		if (!response) {
-			console.log("cachest not match");
 			await next();
 			if (!c.res.ok) {
 				return;
@@ -26,7 +25,6 @@ export const cache = (options: {
 			const response = c.res.clone();
 			provider.set(c.req.url, response);
 		} else {
-			console.log("cachest match");
 			return new Response(response.body, response);
 		}
 	};

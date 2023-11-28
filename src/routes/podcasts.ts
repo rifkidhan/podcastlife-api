@@ -1,6 +1,6 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { feedParser } from "#/models/parsefeed.ts";
-import { FeedObject } from "podcast-partytime";
+import { FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
 import {
 	getPodcastByFeedId,
 	getPodcastsByTag,
@@ -23,14 +23,14 @@ const podcast = new Hono();
 podcast.get(
 	"/podcast/*",
 	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+		cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
 	})
 );
 
 podcast.get(
 	"/tags/*",
 	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+		cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
 	})
 );
 /**
@@ -93,8 +93,10 @@ podcast.get("/podcast/info/:feedId", async (c) => {
  * Get Episodes from request url
  */
 
-podcast.post("/podcast/episodes", async (c) => {
+podcast.post("/podcast/url", async (c) => {
 	const { url } = await c.req.json();
+
+	console.log(url);
 
 	if (!url) {
 		throw new HTTPException(STATUS_CODE.BadRequest, {
@@ -108,8 +110,7 @@ podcast.post("/podcast/episodes", async (c) => {
 		logs("get episodes url data from : ", url);
 		return c.json(
 			{
-				liveitems: items?.podcastLiveItems,
-				episodes: items?.items,
+				items,
 			},
 			STATUS_CODE.OK
 		);

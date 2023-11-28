@@ -1,4 +1,4 @@
-import { parseFeed } from "podcast-partytime";
+import { parseFeed } from "https://esm.sh/podcast-partytime@4.7.0";
 
 const userAgent = Deno.env.get("USER_AGENT");
 

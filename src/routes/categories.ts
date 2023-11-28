@@ -10,7 +10,7 @@ const category = new Hono();
 category.get(
 	"/categories/*",
 	cache({
-		cacheControl: "public, max-age=172800, stale-while-revalidate=86400",
+		cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
 	})
 );
 

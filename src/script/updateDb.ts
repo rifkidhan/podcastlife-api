@@ -1,31 +1,7 @@
 import { db } from "#/db/db.ts";
 import { podcastApi } from "#/models/podcastapi.ts";
 import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
-
-export interface PodcastInfo {
-	key: string;
-	id: number;
-	podcastGuid: string;
-	title: string;
-	url: string;
-	link: string;
-	originalUrl: string;
-	description: string;
-	author: string;
-	ownerName: string;
-	image: string;
-	artwork: string;
-	lastUpdateTime: number;
-	contentType: string;
-	itunesId: number | null;
-	itunesType: string | null;
-	language: string;
-	explicit: boolean;
-	type: number;
-	categories: {
-		[key: string]: string;
-	};
-}
+import { PodcastInfo } from "#/types.ts";
 
 export const fromBucket = async () => {
 	const result = await fetch("https://tracking.podcastindex.org/current", {
