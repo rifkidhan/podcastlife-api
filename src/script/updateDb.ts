@@ -1,7 +1,7 @@
 import { db } from "#/db/db.ts";
 import { podcastApi } from "#/models/podcastapi.ts";
-import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
 import { PodcastInfo } from "#/types.ts";
+// import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
 
 export const fromBucket = async () => {
 	const result = await fetch("https://tracking.podcastindex.org/current", {
@@ -91,27 +91,18 @@ export const fromBucket = async () => {
  * add cron job
  */
 export const cronUpdate = () => {
-	const jobs = new Cron(
-		"0 0 1 * * *",
-		{ name: "update podcast", timezone: "Asia/Jakarta" },
-		async () => {
-			console.log(`update feeds starting`);
-			await fromBucket();
-			console.log("update finished");
-		}
-	);
-
-	if (jobs.isBusy()) {
-		console.log(`is ${jobs.name} doing jobs`);
-	}
-	console.log(`Cron ${jobs.name} running daily: `, jobs.isRunning());
-
-	if (jobs.previousRun()) {
-		console.log("previous update: ", jobs.previousRun()?.toLocaleString());
-	}
-	if (jobs.currentRun()) {
-		console.log("current update: ", jobs.currentRun()?.toLocaleString());
-	}
-
-	console.log("next update: ", jobs.nextRun()?.toLocaleString());
+	// const jobs = new Cron(
+	// 	"0 0 1 * * *",
+	// 	{ name: "update podcast", timezone: "Asia/Jakarta" },
+	// 	async () => {
+	// 		console.log(`update feeds starting`);
+	// 		await fromBucket();
+	// 		console.log("update finished");
+	// 	}
+	// );
+	Deno.cron("update db", "0 1 * * *", async () => {
+		console.log(`update feeds starting`);
+		await fromBucket();
+		console.log("update finished");
+	});
 };
