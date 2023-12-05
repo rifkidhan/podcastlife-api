@@ -15,7 +15,7 @@ const getRecentData = async () => {
 	let nextSince = data.nextSince;
 	let allFeeds = data.data.feeds;
 
-	// console.log("recent since: ", since);
+	console.log("recent since: ", since);
 	// console.log("next since: ", nextSince);
 	// console.log("data length", allFeeds.length);
 
@@ -29,8 +29,8 @@ const getRecentData = async () => {
 		allFeeds = allFeeds.concat(data.data.feeds);
 
 		console.log("recent since: ", since);
-		console.log("next since: ", nextSince);
-		console.log("data length", allFeeds.length);
+		// console.log("next since: ", nextSince);
+		// console.log("data length", allFeeds.length);
 	}
 
 	return allFeeds;
@@ -54,8 +54,6 @@ const updateDB = async () => {
 	for (const feed of recentData) {
 		if (feed.feedLanguage.includes("en" || "in")) {
 			const check = await podcastDB.get(feed.feedId);
-
-			console.log(check.key);
 
 			if (!check) {
 				const nFeed = await getFeedFromPodcastIndex(feed.feedId);
@@ -96,20 +94,22 @@ const updateDB = async () => {
 					console.log(podcast.key);
 				}
 			} else {
+				console.log(check.key);
 				if (feed.feedImage !== "") {
-					await podcastDB.update(
-						{
-							imageUrl: feed.feedImage,
-							newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-						},
-						`${feed.feedId}`
-					);
+					const update = {
+						imageUrl: feed.feedImage,
+						newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+					};
+					await podcastDB.update(update, check.key);
 				} else {
+					const update = {
+						newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+					};
 					await podcastDB.update(
 						{
 							newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
 						},
-						`${feed.feedId}`
+						check.key
 					);
 				}
 				console.log("update data succes: ", feed.feedId);
