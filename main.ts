@@ -9,7 +9,7 @@ import { logs } from "#/middlerwares/log.ts";
 
 const app = new Hono();
 
-cronUpdate();
+// cronUpdate();
 
 /**
  * make response json pretty

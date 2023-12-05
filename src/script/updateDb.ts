@@ -1,85 +1,116 @@
-import { db } from "#/db/db.ts";
 import { podcastApi } from "#/models/podcastapi.ts";
 import { PodcastInfo } from "#/types.ts";
-// import { Cron } from "https://deno.land/x/croner@7.0.5/dist/croner.js";
+import { podcastDB, Podcast } from "#/db/deta.ts";
 
-export const fromBucket = async () => {
-	const result = await fetch("https://tracking.podcastindex.org/current", {
-		method: "GET",
-	});
+/** get data from one hour ago */
+const getRecentData = async () => {
+	console.log("fetch data begin...");
+	const hour = Math.floor(Date.now() / 1000) - 3600;
+	const now = Math.floor(Date.now() / 1000);
+	let data = await podcastApi(`/recent/data?since=${hour}&max=5000`).then(
+		(res) => res.json()
+	);
 
-	const data = await result.json().then((res) => res.data.feeds);
+	let since = data.since;
+	let nextSince = data.nextSince;
+	let allFeeds = data.data.feeds;
 
-	for (const feed of data) {
+	// console.log("recent since: ", since);
+	// console.log("next since: ", nextSince);
+	// console.log("data length", allFeeds.length);
+
+	while (nextSince < now) {
+		data = await podcastApi(
+			`/recent/data?since=${data.nextSince}&max=5000`
+		).then((res) => res.json());
+
+		since = data.since;
+		nextSince = data.nextSince;
+		allFeeds = allFeeds.concat(data.data.feeds);
+
+		console.log("recent since: ", since);
+		console.log("next since: ", nextSince);
+		console.log("data length", allFeeds.length);
+	}
+
+	return allFeeds;
+};
+
+const getFeedFromPodcastIndex = async (id: string) => {
+	const data = await podcastApi(`/podcasts/byfeedid?id=${id}`).then((res) =>
+		res.json()
+	);
+
+	const feed = data.feed as PodcastInfo;
+
+	return feed;
+};
+
+const updateDB = async () => {
+	const recentData = await getRecentData();
+
+	console.log("fetch data done");
+
+	for (const feed of recentData) {
 		if (feed.feedLanguage.includes("en" || "in")) {
-			const checkData = await db
-				.selectFrom("Podcast")
-				.select(["feedId"])
-				.where("feedId", "=", feed.feedId)
-				.executeTakeFirst();
+			const check = await podcastDB.get(feed.feedId);
 
-			console.log(checkData);
+			console.log(check.key);
 
-			if (!checkData) {
-				const checkIndex = await podcastApi(
-					`/podcasts/byfeedid?id=${feed.feedId}`
-				).then((res) => res.json());
+			if (!check) {
+				const nFeed = await getFeedFromPodcastIndex(feed.feedId);
 
-				const nFeed = checkIndex.feed as PodcastInfo;
 				if (nFeed.categories) {
-					const categories = Object.entries(nFeed.categories).join().split(",");
-					const createFeeds = await db
-						.insertInto("Podcast")
-						.values({
-							title: nFeed.title,
-							feedId: nFeed.id,
-							podcastGuid: nFeed.podcastGuid,
-							url: nFeed.url,
-							link: nFeed.link,
-							originalUrl: nFeed.originalUrl,
-							description: nFeed.description,
-							author: nFeed.author,
-							ownerName: nFeed.ownerName,
-							imageUrl: nFeed.image,
-							contentType: nFeed.contentType,
-							itunesId: nFeed.itunesId,
-							itunesType: nFeed.itunesType,
-							language: nFeed.language,
-							explicit: nFeed.explicit,
-							newestItemPublishTime: nFeed.lastUpdateTime,
-							oldestItemPublishTime: nFeed.lastUpdateTime,
-							tag1: categories[0],
-							tag2: categories[1],
-							tag3: categories[2],
-							tag4: categories[3],
-							tag5: categories[4],
-							tag6: categories[5],
-							tag7: categories[6],
-							tag8: categories[7],
-						})
-						.executeTakeFirst();
-					if (createFeeds.numInsertedOrUpdatedRows) {
-						console.log("create data success", nFeed.id);
-					}
+					const tags = Object.entries(nFeed.categories)
+						.join()
+						.split(",")
+						.filter((n) => n);
+
+					const putItem: Podcast = {
+						key: String(nFeed.id),
+						title: nFeed.title,
+						podcastGuid: nFeed.podcastGuid,
+						url: nFeed.url,
+						link: nFeed.link,
+						originalUrl: nFeed.originalUrl,
+						description: nFeed.description,
+						author: nFeed.author,
+						ownerName: nFeed.ownerName,
+						explicit: nFeed.explicit,
+						language: nFeed.language,
+						newestItemPublishTime: String(nFeed.lastUpdateTime),
+						oldestItemPublishTime: String(nFeed.lastUpdateTime),
+						contentType: nFeed.contentType,
+						generator: nFeed.generator,
+						itunesId:
+							typeof nFeed.itunesId === "number"
+								? String(nFeed.itunesId)
+								: undefined,
+						itunesType: nFeed.itunesType,
+						tags,
+						imageUrl: nFeed.image,
+					};
+
+					const podcast = await podcastDB.put(putItem);
+
+					console.log(podcast.key);
 				}
 			} else {
 				if (feed.feedImage !== "") {
-					await db
-						.updateTable("Podcast")
-						.set({
-							newestItemPublishTime: Math.floor(Date.now() / 1000),
+					await podcastDB.update(
+						{
 							imageUrl: feed.feedImage,
-						})
-						.where("feedId", "=", feed.feedId)
-						.executeTakeFirst();
+							newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+						},
+						`${feed.feedId}`
+					);
 				} else {
-					await db
-						.updateTable("Podcast")
-						.set({
-							newestItemPublishTime: Math.floor(Date.now() / 1000),
-						})
-						.where("feedId", "=", feed.feedId)
-						.executeTakeFirst();
+					await podcastDB.update(
+						{
+							newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+						},
+						`${feed.feedId}`
+					);
 				}
 				console.log("update data succes: ", feed.feedId);
 			}
@@ -91,18 +122,9 @@ export const fromBucket = async () => {
  * add cron job
  */
 export const cronUpdate = () => {
-	// const jobs = new Cron(
-	// 	"0 0 1 * * *",
-	// 	{ name: "update podcast", timezone: "Asia/Jakarta" },
-	// 	async () => {
-	// 		console.log(`update feeds starting`);
-	// 		await fromBucket();
-	// 		console.log("update finished");
-	// 	}
-	// );
-	Deno.cron("update db", "0 1 * * *", async () => {
+	Deno.cron("update db", "0 * * * *", async () => {
 		console.log(`update feeds starting`);
-		await fromBucket();
+		await updateDB();
 		console.log("update finished");
 	});
 };

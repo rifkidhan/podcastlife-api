@@ -1,11 +1,6 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { feedParser } from "#/models/parsefeed.ts";
 import { FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
-import {
-	getPodcastByFeedId,
-	getPodcastsByTag,
-	getPodcastUrl,
-} from "#/models/podcast.ts";
 import { integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { HTTPException, Hono } from "hono";
@@ -15,6 +10,7 @@ import { logs } from "#/middlerwares/log.ts";
 import { PodcastLiveStream } from "#/types.ts";
 import { getLiveItem } from "#/helpers/live.ts";
 import { cache } from "#/middlerwares/cache.ts";
+import { podcastDB } from "#/db/deta.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
@@ -39,7 +35,7 @@ podcast.get(
 podcast.get("/podcast/full/:feedId", async (c) => {
 	const id = c.req.param("feedId");
 
-	const data = await getPodcastByFeedId(Number(id));
+	const data = await podcastDB.get(id);
 
 	if (!data) {
 		return c.notFound();
@@ -67,7 +63,7 @@ podcast.get("/podcast/full/:feedId", async (c) => {
 podcast.get("/podcast/info/:feedId", async (c) => {
 	const id = c.req.param("feedId");
 
-	const data = await getPodcastUrl(Number(id));
+	const data = await podcastDB.get(id);
 
 	if (!data) {
 		return c.notFound();
@@ -79,7 +75,6 @@ podcast.get("/podcast/info/:feedId", async (c) => {
 		logs("get info podcast data from : ", id);
 		return c.json(
 			{
-				data,
 				items,
 			},
 			STATUS_CODE.OK
@@ -165,7 +160,7 @@ podcast.get("/trending", async (c) => {
  */
 podcast.get("/tags/:tag", async (c) => {
 	const { tag } = c.req.param();
-	const { perPage, after, before } = c.req.query();
+	const { perPage, last } = c.req.query();
 
 	let reqPage = 50;
 
@@ -173,19 +168,28 @@ podcast.get("/tags/:tag", async (c) => {
 		reqPage = Number(perPage);
 	}
 
-	const data = await getPodcastsByTag({ tag, after, before, perPage: reqPage });
+	let data = await podcastDB.fetch(
+		{ "tags?contains": tag },
+		{ limit: reqPage, desc: true }
+	);
 
-	if (data.rows.length < 1) {
+	if (last) {
+		data = await podcastDB.fetch(
+			{ "tags?contains": tag },
+			{ limit: reqPage, last }
+		);
+	}
+
+	if (data.items.length < 1) {
 		return c.notFound();
 	}
 
 	try {
 		return c.json(
 			{
-				hasNextPage: data.hasNextPage,
-				startCursor: data.startCursor,
-				endCursor: data.endCursor,
-				data: data.rows,
+				data: data.items,
+				count: data.count,
+				last: data.last,
 			},
 			STATUS_CODE.OK
 		);

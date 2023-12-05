@@ -1,5 +1,5 @@
 import { Episode } from "https://esm.sh/podcast-partytime@4.7.0";
-import { getPodcastUrl } from "#/models/podcast.ts";
+import { podcastDB } from "#/db/deta.ts";
 import { feedParser } from "#/models/parsefeed.ts";
 
 export enum Phase4LiveStatus {
@@ -38,7 +38,7 @@ export type PodcastLiveItem = PodcastLiveItemBasic & {
 
 export const getLiveItem = async (id: number) => {
 	const liveItems: PodcastLiveItem[] = [];
-	const getUrl = await getPodcastUrl(id);
+	const getUrl = await podcastDB.get(`${id}`);
 
 	if (!getUrl) return undefined;
 

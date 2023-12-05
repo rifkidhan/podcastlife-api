@@ -13,10 +13,11 @@ export interface PodcastInfo {
 	artwork: string;
 	lastUpdateTime: number;
 	contentType: string;
-	itunesId: number | null;
-	itunesType: string | null;
+	itunesId?: number;
+	itunesType?: string;
 	language: string;
 	explicit: boolean;
+	generator?: string;
 	type: number;
 	categories: {
 		[key: string]: string;

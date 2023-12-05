@@ -1,14 +1,15 @@
 import { Hono, HTTPException } from "hono";
-import { getPodcastsFromCategory } from "#/models/category.ts";
 import { integer } from "#/helpers/matching.ts";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "#/middlerwares/cache.ts";
+import { categoryDB, podcastDB } from "#/db/deta.ts";
+import { groupingCategories } from "#/helpers/matching.ts";
 
 const category = new Hono();
 
 category.get(
-	"/categories/*",
+	"/*",
 	cache({
 		cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
 	})
@@ -19,7 +20,7 @@ category.get(
  */
 category.get("/:categoryName", async (c) => {
 	const cat = c.req.param("categoryName");
-	const { perPage, after, before } = c.req.query();
+	const { perPage, last } = c.req.query();
 
 	let reqPage = 50;
 
@@ -27,14 +28,23 @@ category.get("/:categoryName", async (c) => {
 		reqPage = Number(perPage);
 	}
 
-	const data = await getPodcastsFromCategory({
-		cat,
-		after,
-		before,
-		perPage: reqPage,
-	});
+	const group = groupingCategories(cat);
 
-	if (!data || data.rows.length < 1) {
+	if (!group) {
+		return c.notFound();
+	}
+
+	const parseGroup = group.map((item) => ({
+		"tags?contains": item,
+	}));
+
+	let categories = await podcastDB.fetch(parseGroup, { limit: reqPage });
+
+	if (last) {
+		categories = await podcastDB.fetch(parseGroup, { limit: reqPage, last });
+	}
+
+	if (categories.items.length < 1) {
 		return c.notFound();
 	}
 
@@ -42,10 +52,9 @@ category.get("/:categoryName", async (c) => {
 		logs(cat);
 		return c.json(
 			{
-				hasNextPage: data.hasNextPage,
-				startCursor: data.startCursor,
-				endCursor: data.endCursor,
-				data: data.rows,
+				data: categories.items,
+				count: categories.count,
+				last: categories.last,
 			},
 			STATUS_CODE.OK
 		);
