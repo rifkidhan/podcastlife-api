@@ -49,7 +49,6 @@ const getRecentData = async () => {
 	let allFeeds = data.data.feeds;
 
 	console.log("recent since: ", since);
-	// console.log("next since: ", nextSince);
 	console.log("data length", allFeeds.length);
 
 	while (nextSince < now) {
@@ -62,7 +61,6 @@ const getRecentData = async () => {
 		allFeeds = allFeeds.concat(data.data.feeds);
 
 		console.log("recent since: ", since);
-		// console.log("next since: ", nextSince);
 		console.log("data length", allFeeds.length);
 	}
 
@@ -80,7 +78,7 @@ const getRecentData = async () => {
 		return false;
 	});
 
-	console.log("final data", allData.length);
+	console.log("final data length", allData.length);
 
 	return allData;
 };
@@ -148,29 +146,17 @@ export const updateDB = async () => {
 
 					console.log("podcast added", podcast.key);
 				}
-			} else {
-				const res = await update.json();
-				console.log(res.key);
-				// if (feed.feedImage !== "") {
-				// 	const update = {
-				// 		imageUrl: feed.feedImage,
-				// 		newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-				// 	};
-				// 	await podcastDB.update(update, check.key);
-				// } else {
-				// 	const update = {
-				// 		newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-				// 	};
-				// 	await podcastDB.update(
-				// 		{
-				// 			newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-				// 		},
-				// 		check.key
-				// 	);
-				// }
-				console.log("update podcast success: ", res.key);
 			}
 		}
+	}
+};
+
+export const deleteDeadPodcast = async () => {
+	console.log("fetch dead podcast");
+	const data = await podcastApi("/podcasts/dead").then((res) => res.json());
+
+	for (const feed of data.feeds) {
+		await podcastDB.delete(feed.id);
 	}
 };
 
@@ -178,9 +164,14 @@ export const updateDB = async () => {
  * add cron job
  */
 export const cronUpdate = () => {
-	Deno.cron("update db", "0 * * * *", async () => {
+	Deno.cron("update db", "0 */2 * * *", async () => {
 		console.log(`update feeds starting`);
 		await updateDB();
 		console.log("update finished");
+	});
+	Deno.cron("remove podcast dead", "0 0 1 * *", async () => {
+		console.log(`delete feeds starting`);
+		await deleteDeadPodcast();
+		console.log("remove finished");
 	});
 };

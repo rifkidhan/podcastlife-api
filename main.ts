@@ -6,6 +6,7 @@ import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
 import { cronUpdate } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
+import { podcastApi } from "#/models/podcastapi.ts";
 
 const app = new Hono();
 
@@ -43,7 +44,12 @@ app.onError((err, c) => {
 });
 app.use("*", logger(logs));
 
-app.get("/", (c) => c.text("Podcastlife Api"));
+// app.get("/", (c) => c.text("Podcastlife Api"));
+app.get("/", async (c) => {
+	const data = await podcastApi("/podcasts/dead").then((res) => res.json());
+
+	return c.json(data);
+});
 
 app.route("/v1/podcasts", podcast);
 app.route("/v1/categories", category);
