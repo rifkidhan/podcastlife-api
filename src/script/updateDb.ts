@@ -2,6 +2,39 @@ import { podcastApi } from "#/models/podcastapi.ts";
 import { PodcastInfo } from "#/types.ts";
 import { podcastDB, Podcast } from "#/db/deta.ts";
 
+const detaUrl = `${Deno.env.get("DETA_URL")}/podcast`;
+
+const detaKey = Deno.env.get("DETA_KEY") as string;
+
+const updateHttp = async ({
+	key,
+	objects,
+}: {
+	key: string;
+	objects: {
+		imageUrl?: string;
+		newestItemPublishTime: string;
+	};
+}) => {
+	let putData = {
+		newestItemPublishTime: objects.newestItemPublishTime,
+	};
+
+	if (objects.imageUrl && objects.imageUrl !== "") {
+		putData = Object.assign(putData, { imageUrl: objects.imageUrl });
+	}
+	const data = await fetch(detaUrl + "/items/" + key, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json",
+			"X-API-Key": detaKey,
+		},
+		body: JSON.stringify({ set: putData }),
+	});
+
+	return data;
+};
+
 /** get data from one hour ago */
 const getRecentData = async () => {
 	console.log("fetch data begin...");
@@ -17,7 +50,7 @@ const getRecentData = async () => {
 
 	console.log("recent since: ", since);
 	// console.log("next since: ", nextSince);
-	// console.log("data length", allFeeds.length);
+	console.log("data length", allFeeds.length);
 
 	while (nextSince < now) {
 		data = await podcastApi(
@@ -30,10 +63,26 @@ const getRecentData = async () => {
 
 		console.log("recent since: ", since);
 		// console.log("next since: ", nextSince);
-		// console.log("data length", allFeeds.length);
+		console.log("data length", allFeeds.length);
 	}
 
-	return allFeeds;
+	const idx = new Set();
+
+	const allData = allFeeds.filter((obj: any) => {
+		const isDuplicate = idx.has(obj.feedId);
+
+		idx.add(obj.feedId);
+
+		if (!isDuplicate) {
+			return true;
+		}
+
+		return false;
+	});
+
+	console.log("final data", allData.length);
+
+	return allData;
 };
 
 const getFeedFromPodcastIndex = async (id: string) => {
@@ -46,16 +95,22 @@ const getFeedFromPodcastIndex = async (id: string) => {
 	return feed;
 };
 
-const updateDB = async () => {
+export const updateDB = async () => {
 	const recentData = await getRecentData();
 
 	console.log("fetch data done");
 
 	for (const feed of recentData) {
 		if (feed.feedLanguage.includes("en" || "in")) {
-			const check = await podcastDB.get(feed.feedId);
+			const update = await updateHttp({
+				key: feed.feedId,
+				objects: {
+					imageUrl: feed.feedImage,
+					newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+				},
+			});
 
-			if (!check) {
+			if (!update.ok) {
 				const nFeed = await getFeedFromPodcastIndex(feed.feedId);
 
 				if (nFeed.categories) {
@@ -91,28 +146,29 @@ const updateDB = async () => {
 
 					const podcast = await podcastDB.put(putItem);
 
-					console.log(podcast.key);
+					console.log("podcast added", podcast.key);
 				}
 			} else {
-				console.log(check.key);
-				if (feed.feedImage !== "") {
-					const update = {
-						imageUrl: feed.feedImage,
-						newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-					};
-					await podcastDB.update(update, check.key);
-				} else {
-					const update = {
-						newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-					};
-					await podcastDB.update(
-						{
-							newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
-						},
-						check.key
-					);
-				}
-				console.log("update data succes: ", feed.feedId);
+				const res = await update.json();
+				console.log(res.key);
+				// if (feed.feedImage !== "") {
+				// 	const update = {
+				// 		imageUrl: feed.feedImage,
+				// 		newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+				// 	};
+				// 	await podcastDB.update(update, check.key);
+				// } else {
+				// 	const update = {
+				// 		newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+				// 	};
+				// 	await podcastDB.update(
+				// 		{
+				// 			newestItemPublishTime: String(Math.floor(Date.now() / 1000)),
+				// 		},
+				// 		check.key
+				// 	);
+				// }
+				console.log("update podcast success: ", res.key);
 			}
 		}
 	}
