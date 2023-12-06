@@ -1,12 +1,13 @@
 import "env";
-import { Hono, HTTPException } from "hono/mod.ts";
+import { Context, Hono, HTTPException } from "hono/mod.ts";
 import { bearerAuth, prettyJSON, compress, logger } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
 import { cronUpdate } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
-import { podcastApi } from "#/models/podcastapi.ts";
+import { createYoga } from "graphql-yoga";
+import schema from "#/graphql/schema.ts";
 
 const app = new Hono();
 
@@ -18,7 +19,7 @@ cronUpdate();
  */
 app.use("*", prettyJSON());
 
-app.use("*", compress({ encoding: "gzip" }));
+// app.use("*", compress({ encoding: "gzip" }));
 
 /**
  * Token
@@ -42,13 +43,21 @@ app.onError((err, c) => {
 	console.error(err);
 	return c.json({ message: err.message }, STATUS_CODE.InternalServerError);
 });
-app.use("*", logger(logs));
+app.use("*", logger());
 
-// app.get("/", (c) => c.text("Podcastlife Api"));
-app.get("/", async (c) => {
-	const data = await podcastApi("/podcasts/dead").then((res) => res.json());
+const yoga = createYoga({
+	schema,
+	graphiql: Deno.env.get("ENV") === "development",
+});
 
-	return c.json(data);
+app.on(["POST", "GET", "OPTIONS"], "/graphql", async (c) => {
+	const response = await yoga.handleRequest(c.req.raw, c);
+
+	return new Response(response.body, response);
+});
+
+app.get("/", (c) => {
+	return c.text("Podcastlife API");
 });
 
 app.route("/v1/podcasts", podcast);
