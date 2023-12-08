@@ -1,19 +1,19 @@
 import {
-	GraphQLString,
-	GraphQLObjectType,
-	GraphQLNonNull,
 	GraphQLBoolean,
-	GraphQLList,
-	GraphQLInt,
 	GraphQLEnumType,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLString,
 } from "graphql";
 
 import {
 	Enclosure,
-	Phase4Value,
-	Phase4ValueRecipient,
 	Phase2Person,
 	Phase3AltEnclosure,
+	Phase4Value,
+	Phase4ValueRecipient,
 } from "https://esm.sh/podcast-partytime@4.7.0";
 
 type PodcastImage = {
@@ -221,4 +221,22 @@ export const EnclosureFragment = new GraphQLObjectType<Enclosure>({
 			resolve: (root) => root.type,
 		},
 	},
+});
+
+export const PageInfoFragment = new GraphQLObjectType<{
+	cursor?: string;
+	count: number;
+}>({
+	name: "PageInfo",
+	fields: {
+		endCursor: {
+			type: GraphQLString,
+			resolve: (root) => root.cursor,
+		},
+		count: {
+			type: new GraphQLNonNull(GraphQLInt),
+			resolve: (root) => root.count,
+		},
+	},
+	description: "page info response",
 });

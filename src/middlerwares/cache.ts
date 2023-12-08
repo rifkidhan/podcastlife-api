@@ -5,8 +5,9 @@ export const cache = (options: {
 	cacheControl?: string;
 }): MiddlewareHandler => {
 	const addHeader = (response: Response) => {
-		if (options.cacheControl)
+		if (options.cacheControl) {
 			response.headers.set("Cache-Control", options.cacheControl);
+		}
 	};
 
 	const provider = cachest();

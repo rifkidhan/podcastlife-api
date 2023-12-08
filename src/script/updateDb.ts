@@ -1,6 +1,6 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { PodcastInfo } from "#/types.ts";
-import { podcastDB, Podcast } from "#/db/deta.ts";
+import { Podcast, podcastDB } from "#/db/deta.ts";
 import { integer } from "#/helpers/matching.ts";
 
 const detaUrl = `${Deno.env.get("DETA_URL")}/podcast`;

@@ -1,6 +1,6 @@
 import "env";
-import { Context, Hono, HTTPException } from "hono/mod.ts";
-import { bearerAuth, prettyJSON, compress, logger } from "hono/middleware.ts";
+import { Hono, HTTPException } from "hono/mod.ts";
+import { bearerAuth, logger, prettyJSON } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
@@ -11,7 +11,7 @@ import schema from "#/graphql/schema.ts";
 
 const app = new Hono();
 
-cronUpdate();
+// cronUpdate();
 
 /**
  * make response json pretty
@@ -24,7 +24,7 @@ app.use("*", prettyJSON());
 /**
  * Token
  */
-app.use("/v1/*", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
+app.use("/*", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
 
 /**
  * Response for not found

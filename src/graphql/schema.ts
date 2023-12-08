@@ -1,13 +1,13 @@
 import {
+	GraphQLBoolean,
+	GraphQLEnumType,
+	GraphQLID,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
 	GraphQLSchema,
 	GraphQLString,
-	GraphQLObjectType,
-	GraphQLID,
-	GraphQLNonNull,
-	GraphQLBoolean,
-	GraphQLList,
-	GraphQLInt,
-	GraphQLEnumType,
 } from "graphql";
 import {
 	Episode,
@@ -16,21 +16,24 @@ import {
 import { integer } from "#/helpers/matching.ts";
 import {
 	AlternativeEnclosureFragment,
-	ValueFragment,
 	EnclosureFragment,
+	EpisodeType,
 	ImagesFragment,
 	PersonFragment,
-	EpisodeType,
+	ValueFragment,
+	PageInfoFragment,
 } from "./fragments.ts";
+import { EnumLanguage, EnumCategory } from "./Enum.ts";
 
 import {
-	getLive,
-	PodcastLiveItem,
-	Podcast,
-	getPodcast,
-	getTrending,
 	getEpisode,
 	getFullPodcast,
+	getLive,
+	getPodcasts,
+	getTrending,
+	Podcast,
+	PodcastLiveItem,
+	getPodcastsByCategory,
 } from "./podcast.ts";
 
 type Query = {
@@ -42,6 +45,13 @@ type Query = {
 		data: Podcast;
 		episodes: Episode[];
 		live?: PodcastLiveItem;
+	};
+	podcasts: {
+		data: Podcast[];
+		info: {
+			cursor?: string;
+			count: number;
+		};
 	};
 };
 
@@ -323,11 +333,51 @@ const live = new GraphQLObjectType<PodcastLiveItem>({
 	},
 });
 
+const podcastsList = new GraphQLObjectType<{
+	data: Podcast[];
+	info: {
+		cursor?: string;
+		count: number;
+	};
+}>({
+	name: "Podcasts",
+	fields: {
+		data: {
+			type: new GraphQLList(podcast),
+			resolve: (parent) => parent.data,
+		},
+		info: {
+			type: new GraphQLNonNull(PageInfoFragment),
+			resolve: (parent) => parent.info,
+		},
+	},
+});
+
 const QueryRoot = new GraphQLObjectType<Query>({
 	name: "Query",
 	fields: {
-		podcastInfo: {
-			type: podcast,
+		podcast: {
+			type: new GraphQLObjectType<{
+				data: Podcast;
+				episodes: Episode[];
+				live?: PodcastLiveItem[];
+			}>({
+				name: "Podcast",
+				fields: {
+					data: {
+						type: new GraphQLNonNull(podcast),
+						resolve: (parent) => parent.data,
+					},
+					episodes: {
+						type: new GraphQLNonNull(new GraphQLList(episode)),
+						resolve: (parent) => parent.episodes,
+					},
+					live: {
+						type: new GraphQLList(live),
+						resolve: (parent) => parent.live,
+					},
+				},
+			}),
 			args: {
 				id: {
 					type: new GraphQLNonNull(GraphQLID),
@@ -335,10 +385,70 @@ const QueryRoot = new GraphQLObjectType<Query>({
 			},
 			resolve: (_, args: { id: string }) => {
 				const { id } = args;
-
-				return getPodcast(id);
+				return getFullPodcast(id);
 			},
-			description: "Get podcast info by key",
+			description: "Get podcast data including episodes and livestreams",
+		},
+		podcasts: {
+			type: podcastsList,
+			args: {
+				limit: {
+					type: GraphQLInt,
+				},
+				tag: {
+					type: GraphQLString,
+				},
+				language: {
+					type: EnumLanguage,
+				},
+				cursor: {
+					type: GraphQLString,
+				},
+			},
+			resolve: (
+				_,
+				args: {
+					limit?: number;
+					tag?: string;
+					language?: "en" | "in";
+					cursor?: string;
+				}
+			) => {
+				const { limit, tag, language, cursor } = args;
+
+				return getPodcasts({ language, tag, limit, cursor });
+			},
+			description: "fetch podcasts",
+		},
+		podcastByCategory: {
+			type: podcastsList,
+			args: {
+				limit: {
+					type: GraphQLInt,
+				},
+				category: {
+					type: new GraphQLNonNull(EnumCategory),
+				},
+				language: {
+					type: EnumLanguage,
+				},
+				cursor: {
+					type: GraphQLString,
+				},
+			},
+			resolve: (
+				_,
+				args: {
+					limit?: number;
+					category: string;
+					language?: "en" | "in";
+					cursor?: string;
+				}
+			) => {
+				const { limit, category, language, cursor } = args;
+
+				return getPodcastsByCategory({ limit, category, language, cursor });
+			},
 		},
 		live: {
 			type: new GraphQLNonNull(new GraphQLList(live)),
@@ -352,20 +462,10 @@ const QueryRoot = new GraphQLObjectType<Query>({
 					type: GraphQLInt,
 				},
 				category: {
-					type: GraphQLString,
+					type: EnumCategory,
 				},
 				language: {
-					type: new GraphQLEnumType({
-						name: "EnumLanguage",
-						values: {
-							EN: {
-								value: "en",
-							},
-							IN: {
-								value: "in",
-							},
-						},
-					}),
+					type: EnumLanguage,
 				},
 				since: {
 					type: new GraphQLEnumType({
@@ -424,39 +524,6 @@ const QueryRoot = new GraphQLObjectType<Query>({
 			},
 			description:
 				"Get episode metadata from id podcast(feedId) and episode guid",
-		},
-		podcast: {
-			type: new GraphQLObjectType<{
-				data: Podcast;
-				episodes: Episode[];
-				live?: PodcastLiveItem[];
-			}>({
-				name: "Podcast",
-				fields: {
-					data: {
-						type: new GraphQLNonNull(podcast),
-						resolve: (parent) => parent.data,
-					},
-					episodes: {
-						type: new GraphQLNonNull(new GraphQLList(episode)),
-						resolve: (parent) => parent.episodes,
-					},
-					live: {
-						type: new GraphQLList(live),
-						resolve: (parent) => parent.live,
-					},
-				},
-			}),
-			args: {
-				id: {
-					type: new GraphQLNonNull(GraphQLID),
-				},
-			},
-			resolve: (_, args: { id: string }) => {
-				const { id } = args;
-				return getFullPodcast(id);
-			},
-			description: "Get podcast data including episodes and livestreams",
 		},
 	},
 });

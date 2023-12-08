@@ -1,20 +1,20 @@
 {
-	"tasks": {
-		"dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
-		"start": "deno run --allow-read --allow-env --allow-net main.ts",
-		"seed": "deno run --allow-read --allow-env --allow-net src/script/cat.ts"
-	},
-	"imports": {
-		"#/": "./src/",
-		"env": "https://deno.land/std@0.207.0/dotenv/load.ts",
-		"hono": "https://deno.land/x/hono/mod.ts",
-		"hono/": "https://deno.land/x/hono/",
-		"kysely": "https://esm.sh/kysely@0.26.3",
-		"kysely-planetscale": "https://esm.sh/kysely-planetscale@1.4.0",
-		"@planetscale/database": "https://esm.sh/@planetscale/database@1.11.0",
-		"kysely-paginate": "https://esm.sh/kysely-paginate@0.3.1",
-		"http-status": "https://deno.land/std@0.207.0/http/status.ts",
-		"graphql": "npm:graphql",
-		"graphql-yoga": "npm:graphql-yoga"
-	}
+  "tasks": {
+    "dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
+    "start": "deno run --allow-read --allow-env --allow-net main.ts",
+    "seed": "deno run --allow-read --allow-env --allow-net src/script/cat.ts"
+  },
+  "imports": {
+    "#/": "./src/",
+    "env": "https://deno.land/std@0.207.0/dotenv/load.ts",
+    "hono": "https://deno.land/x/hono/mod.ts",
+    "hono/": "https://deno.land/x/hono/",
+    "kysely": "https://esm.sh/kysely@0.26.3",
+    "kysely-planetscale": "https://esm.sh/kysely-planetscale@1.4.0",
+    "@planetscale/database": "https://esm.sh/@planetscale/database@1.11.0",
+    "kysely-paginate": "https://esm.sh/kysely-paginate@0.3.1",
+    "http-status": "https://deno.land/std@0.207.0/http/status.ts",
+    "graphql": "npm:graphql",
+    "graphql-yoga": "npm:graphql-yoga"
+  }
 }
