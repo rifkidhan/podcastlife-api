@@ -1,6 +1,7 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { PodcastInfo } from "#/types.ts";
 import { podcastDB, Podcast } from "#/db/deta.ts";
+import { integer } from "#/helpers/matching.ts";
 
 const detaUrl = `${Deno.env.get("DETA_URL")}/podcast`;
 
@@ -98,6 +99,8 @@ export const updateDB = async () => {
 
 	console.log("fetch data done");
 
+	const newFeeds: Podcast[] = [];
+
 	for (const feed of recentData) {
 		if (feed.feedLanguage.includes("en" || "in")) {
 			const update = await updateHttp({
@@ -115,7 +118,7 @@ export const updateDB = async () => {
 					const tags = Object.entries(nFeed.categories)
 						.join()
 						.split(",")
-						.filter((n) => n);
+						.filter((n) => integer(n) === false);
 
 					const putItem: Podcast = {
 						key: String(nFeed.id),
@@ -141,14 +144,34 @@ export const updateDB = async () => {
 						tags,
 						imageUrl: nFeed.image,
 					};
+					newFeeds.push(putItem);
 
-					const podcast = await podcastDB.put(putItem);
+					// const podcast = await podcastDB.put(putItem);
 
-					console.log("podcast added", podcast.key);
+					// console.log("podcast added", podcast.key);
 				}
 			}
 		}
 	}
+
+	console.log("new feeds", newFeeds.length);
+
+	if (newFeeds.length > 25) {
+		const limit = 25;
+		let page = 1;
+		let slicer = newFeeds.slice((page - 1) * limit, limit * page);
+
+		console.log("podcast add from", slicer[0].key);
+		while (slicer.length < 1) {
+			page++;
+			slicer = newFeeds.slice((page - 1) * limit, limit * page);
+			console.log("podcast add from", slicer[0].key);
+		}
+	} else {
+		await podcastDB.putMany(newFeeds);
+	}
+
+	console.log("done====>>>>>");
 };
 
 export const deleteDeadPodcast = async () => {

@@ -4,17 +4,14 @@ export const integer = (param: string): boolean => {
 	return reg.test(param);
 };
 
-export const language = (search: string) => {
+export const language = (search?: string) => {
 	switch (search) {
-		case "all":
-			return "in,en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
 		case "en":
 			return "en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
 		case "in":
 			return "in";
 		default:
-			"in,en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
-			break;
+			return "in,en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
 	}
 };
 

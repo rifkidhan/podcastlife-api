@@ -43,7 +43,7 @@ app.onError((err, c) => {
 	console.error(err);
 	return c.json({ message: err.message }, STATUS_CODE.InternalServerError);
 });
-app.use("*", logger());
+app.use("*", logger(logs));
 
 const yoga = createYoga({
 	schema,

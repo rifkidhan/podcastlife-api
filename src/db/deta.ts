@@ -1,4 +1,5 @@
 import { Deta } from "https://cdn.deta.space/js/deta@2.0.0/deta.mjs";
+import { Phase4Value } from "https://esm.sh/podcast-partytime@4.7.0";
 
 const deta = Deta(Deno.env.get("DETA_KEY"));
 
@@ -26,6 +27,7 @@ export type Podcast = {
 	newestItemPublishTime: string;
 	oldestItemPublishTime: string;
 	tags: string[];
+	value?: Phase4Value;
 };
 
 export type Category = Pick<

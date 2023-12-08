@@ -1,39 +1,45 @@
-import { Episode } from "https://esm.sh/podcast-partytime@4.7.0";
+import { Episode, FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
 import { podcastDB } from "#/db/deta.ts";
 import { feedParser } from "#/models/parsefeed.ts";
 
-export enum Phase4LiveStatus {
-	Pending = "pending",
-	Live = "live",
-	Ended = "ended",
-}
+// export enum Phase4LiveStatus {
+// 	Pending = "pending",
+// 	Live = "live",
+// 	Ended = "ended",
+// }
 
-type PodcastLiveItemBasic = Pick<Episode, "title" | "guid" | "enclosure"> &
-	Partial<
-		Pick<
-			Episode,
-			| "description"
-			| "link"
-			| "author"
-			| "podcastPeople"
-			| "alternativeEnclosures"
-			| "podcastImages"
-			| "value"
-		>
-	>;
-type Phase4ContentLink = {
-	url: string;
-	title: string;
-};
+// type PodcastLiveItemBasic = Pick<Episode, "title" | "guid" | "enclosure"> &
+// 	Partial<
+// 		Pick<
+// 			Episode,
+// 			| "description"
+// 			| "link"
+// 			| "author"
+// 			| "podcastPeople"
+// 			| "alternativeEnclosures"
+// 			| "podcastImages"
+// 			| "value"
+// 		>
+// 	>;
+// type Phase4ContentLink = {
+// 	url: string;
+// 	title: string;
+// };
 
-export type PodcastLiveItem = PodcastLiveItemBasic & {
+// export type PodcastLiveItem = PodcastLiveItemBasic & {
+// 	feedId: number;
+// 	feedTitle: string;
+// 	status: Phase4LiveStatus;
+// 	start: Date;
+// 	end?: Date;
+// 	image?: string;
+// 	contentLinks: Phase4ContentLink[];
+// };
+type Unpack<T> = T extends (infer U)[] ? U : T;
+
+export type PodcastLiveItem = Unpack<FeedObject["podcastLiveItems"]> & {
 	feedId: number;
 	feedTitle: string;
-	status: Phase4LiveStatus;
-	start: Date;
-	end?: Date;
-	image?: string;
-	contentLinks: Phase4ContentLink[];
 };
 
 export const getLiveItem = async (id: number) => {
