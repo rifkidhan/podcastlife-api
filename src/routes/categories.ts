@@ -3,7 +3,7 @@ import { integer } from "#/helpers/matching.ts";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "#/middlerwares/cache.ts";
-import { categoryDB, podcastDB } from "#/db/deta.ts";
+import { podcastDB } from "#/db/deta.ts";
 import { groupingCategories } from "#/helpers/matching.ts";
 
 const category = new Hono();

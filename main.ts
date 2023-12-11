@@ -12,7 +12,7 @@ import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
 
 const app = new Hono();
 
-// cronUpdate();
+cronUpdate();
 
 /**
  * make response json pretty
