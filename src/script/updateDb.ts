@@ -178,9 +178,20 @@ export const deleteDeadPodcast = async () => {
 	console.log("fetch dead podcast");
 	const data = await podcastApi("/podcasts/dead").then((res) => res.json());
 
+	console.log("fetch done");
 	for (const feed of data.feeds) {
-		await podcastDB.delete(feed.id);
+		await fetch(detaUrl + "/items/" + feed.id, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+				"X-API-Key": detaKey,
+			},
+		});
+
+		console.log("remove ", feed.id);
 	}
+
+	console.log("++++remove complete++++");
 };
 
 /**
@@ -191,10 +202,5 @@ export const cronUpdate = () => {
 		console.log(`update feeds starting`);
 		await updateDB();
 		console.log("update finished");
-	});
-	Deno.cron("remove podcast dead", "0 0 1 * *", async () => {
-		console.log(`delete feeds starting`);
-		await deleteDeadPodcast();
-		console.log("remove finished");
 	});
 };
