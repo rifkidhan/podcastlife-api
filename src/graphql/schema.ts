@@ -333,6 +333,56 @@ const live = new GraphQLObjectType<PodcastLiveItem>({
 	},
 });
 
+const trending = new GraphQLObjectType({
+	name: "TrendingFeed",
+	fields: {
+		id: {
+			type: new GraphQLNonNull(GraphQLID),
+			resolve: (root) => root.id,
+		},
+		title: {
+			type: new GraphQLNonNull(GraphQLString),
+			resolve: (root) => root.title,
+		},
+		url: {
+			type: new GraphQLNonNull(GraphQLString),
+			resolve: (root) => root.url,
+		},
+		description: {
+			type: GraphQLString,
+			resolve: (root) => root.description,
+		},
+		author: {
+			type: GraphQLString,
+			resolve: (root) => root.author,
+		},
+		image: {
+			type: GraphQLString,
+			resolve: (root) => root.image,
+		},
+		trendScore: {
+			type: GraphQLInt,
+			resolve: (root) => root.trendScore,
+		},
+		itunesId: {
+			type: GraphQLString,
+			resolve: (root) => root.itunesId,
+		},
+		language: {
+			type: new GraphQLNonNull(GraphQLString),
+			resolve: (root) => root.language,
+		},
+		newestItemPublishTime: {
+			type: new GraphQLNonNull(GraphQLString),
+			resolve: (root) => root.newestItemPublishTime,
+		},
+		tags: {
+			type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+			resolve: (root) => root.tags,
+		},
+	},
+});
+
 const podcastsList = new GraphQLObjectType<{
 	data: Podcast[];
 	info: {
@@ -456,7 +506,7 @@ const QueryRoot = new GraphQLObjectType<Query>({
 			description: "Get livestream podcast",
 		},
 		trending: {
-			type: new GraphQLNonNull(new GraphQLList(podcast)),
+			type: new GraphQLNonNull(new GraphQLList(trending)),
 			args: {
 				limit: {
 					type: GraphQLInt,

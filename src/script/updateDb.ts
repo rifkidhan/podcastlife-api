@@ -99,6 +99,8 @@ export const updateDB = async () => {
 
 	console.log("fetch data done");
 
+	let updateTotal = 0;
+
 	const newFeeds: Podcast[] = [];
 
 	for (const feed of recentData) {
@@ -145,32 +147,51 @@ export const updateDB = async () => {
 						imageUrl: nFeed.image,
 					};
 					newFeeds.push(putItem);
-
-					// const podcast = await podcastDB.put(putItem);
-
-					// console.log("podcast added", podcast.key);
 				}
 			}
+			updateTotal++;
 		}
 	}
 
 	console.log("new feeds", newFeeds.length);
 
-	if (newFeeds.length > 25) {
-		const limit = 25;
-		let page = 1;
-		let slicer = newFeeds.slice((page - 1) * limit, limit * page);
+	let putTotal = 0;
+	let putTotalError = 0;
+	if (newFeeds.length > 0) {
+		if (newFeeds.length > 25) {
+			const limit = 25;
+			let page = 1;
+			let slicer = newFeeds.slice((page - 1) * limit, limit * page);
 
-		console.log("podcast add from", slicer[0].key);
-		while (slicer.length < 1) {
-			page++;
-			slicer = newFeeds.slice((page - 1) * limit, limit * page);
-			console.log("podcast add from", slicer[0].key);
+			while (slicer.length > 0) {
+				await podcastDB.putMany(slicer).then((res: any) => {
+					console.log(
+						"podcast process from",
+						res.processed.items.map((item: any) => item.key)
+					);
+					putTotal += res.processed.items.length;
+					console.log("podcast failed from", res.failed);
+					putTotalError += res.failed ? res.failed.items.length : 0;
+				});
+				page++;
+				slicer = newFeeds.slice((page - 1) * limit, limit * page);
+			}
+		} else {
+			await podcastDB.putMany(newFeeds).then((res: any) => {
+				console.log(
+					"podcast process from",
+					res.processed.items.map((item: any) => item.key)
+				);
+				putTotal += res.processed.items.length;
+				console.log("podcast failed from", res.failed);
+				putTotalError += res.failed ? res.failed.items.length : 0;
+			});
 		}
-	} else {
-		await podcastDB.putMany(newFeeds);
 	}
 
+	console.log("total successed add podcast: ", putTotal);
+	console.log("total failed add podcast: ", putTotalError);
+	console.log("total update: ", updateTotal);
 	console.log("done====>>>>>");
 };
 

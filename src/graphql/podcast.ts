@@ -225,10 +225,9 @@ export const getTrending = async ({
 
 	return result.map((item: any) => ({
 		...item,
-		key: item.id,
-		imageUrl: item.image,
 		tags: Object.entries(item.categories)
 			.join()
+			.toLowerCase()
 			.split(",")
 			.filter((n) => integer(n) === false),
 	}));

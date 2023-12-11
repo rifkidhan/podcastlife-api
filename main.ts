@@ -18,9 +18,7 @@ cronUpdate();
  * make response json pretty
  * GET /?pretty
  */
-app.use("*", prettyJSON());
-
-// app.use("*", compress({ encoding: "gzip" }));
+app.use("/v1/*", prettyJSON());
 
 /**
  * Token
