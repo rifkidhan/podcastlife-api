@@ -298,12 +298,12 @@ export const getLive = async () => {
 		}
 	}
 
-	const live: PodcastLiveItem[] = [];
+	let live: PodcastLiveItem[] = [];
 
 	for (const item of fromIndex) {
 		const liveItems = await getLiveItem(item);
 		if (liveItems) {
-			live.concat(liveItems);
+			live = live.concat(liveItems);
 		}
 	}
 

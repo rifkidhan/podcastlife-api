@@ -7,7 +7,7 @@ import { Hono, HTTPException } from "hono";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { logs } from "#/middlerwares/log.ts";
 import { PodcastLiveStream } from "#/types.ts";
-import { getLiveItem } from "#/helpers/live.ts";
+import { getLiveItem, PodcastLiveItem } from "#/helpers/live.ts";
 import { cache } from "#/middlerwares/cache.ts";
 import { podcastDB } from "#/db/deta.ts";
 
@@ -233,12 +233,12 @@ podcast.get("/live", async (c) => {
 		}
 	}
 
-	const live: FeedObject["podcastLiveItems"] = [];
+	let live: PodcastLiveItem[] = [];
 
 	for (const items of fromIndex) {
 		const liveItems = await getLiveItem(items.feedId);
 		if (liveItems) {
-			live.concat(liveItems);
+			live = live.concat(liveItems);
 		}
 	}
 

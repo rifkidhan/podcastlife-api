@@ -70,6 +70,7 @@ const yoga = createYoga({
 				"Query.podcast": 20_000,
 				"Query.podcasts": 10_000,
 				"Query.podcastByCategory": 20_000,
+				"Query.live": 30_000,
 			},
 		}),
 	],
