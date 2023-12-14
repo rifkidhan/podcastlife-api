@@ -300,12 +300,15 @@ export const getLive = async () => {
 
 	let live: PodcastLiveItem[] = [];
 
-	for (const item of fromIndex) {
-		const liveItems = await getLiveItem(item);
-		if (liveItems) {
-			live = live.concat(liveItems);
-		}
-	}
+	await Promise.all(
+		fromIndex.map((item) =>
+			getLiveItem(item).then((res) => {
+				if (res) {
+					live = live.concat(res);
+				}
+			})
+		)
+	);
 
 	return live;
 };

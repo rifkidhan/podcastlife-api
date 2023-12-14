@@ -212,7 +212,7 @@ podcast.get("/live", async (c) => {
 
 	const items = await result.json().then((res) => res.items);
 
-	const fromIndex: PodcastLiveStream[] = [];
+	const fromIndex: number[] = [];
 	const idx = new Set();
 
 	const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
@@ -228,19 +228,29 @@ podcast.get("/live", async (c) => {
 	});
 
 	for (const index of liveFromPodcastIndex) {
-		if (index.feedLanguage.includes("en" || "in")) {
-			fromIndex.push(index);
+		if (index.feedLanguage.includes("en" || "in") && index.categories) {
+			fromIndex.push(index.feedId);
 		}
 	}
 
 	let live: PodcastLiveItem[] = [];
 
-	for (const items of fromIndex) {
-		const liveItems = await getLiveItem(items.feedId);
-		if (liveItems) {
-			live = live.concat(liveItems);
-		}
-	}
+	// for (const items of fromIndex) {
+	// 	const liveItems = await getLiveItem(items);
+	// 	if (liveItems) {
+	// 		live = live.concat(liveItems);
+	// 	}
+	// }
+
+	await Promise.all(
+		fromIndex.map((item) =>
+			getLiveItem(item).then((res) => {
+				if (res) {
+					live = live.concat(res);
+				}
+			})
+		)
+	);
 
 	return c.json({ items: live }, STATUS_CODE.OK);
 });

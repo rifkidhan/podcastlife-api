@@ -27,12 +27,14 @@ export const getLiveItem = async (id: number) => {
 				image: feed.image?.url,
 				feedTitle: feed.title,
 				feedId: id,
+				author: item.author ?? feed.author ?? getUrl.author,
 			};
 		}
 		return {
 			...item,
 			feedTitle: feed.title,
 			feedId: id,
+			author: item.author ?? feed.author ?? getUrl.author,
 		};
 	});
 };
