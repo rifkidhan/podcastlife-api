@@ -238,7 +238,7 @@ podcast.get("/live", async (c) => {
 	for (const items of fromIndex) {
 		const liveItems = await getLiveItem(items.feedId);
 		if (liveItems) {
-			liveItems.map((item) => live.push(item));
+			live.concat(liveItems);
 		}
 	}
 

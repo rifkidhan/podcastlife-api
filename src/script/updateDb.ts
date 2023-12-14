@@ -218,10 +218,10 @@ export const deleteDeadPodcast = async () => {
 /**
  * add cron job
  */
-export const cronUpdate = () => {
-	Deno.cron("update feeds", "0 */2 * * *", async () => {
-		console.log(`update feeds starting`);
-		await updateDB();
-		console.log("update finished");
-	});
-};
+// export const cronUpdate = () => {
+// 	Deno.cron("update feeds", "0 */2 * * *", async () => {
+// 		console.log(`update feeds starting`);
+// 		await updateDB();
+// 		console.log("update finished");
+// 	});
+// };

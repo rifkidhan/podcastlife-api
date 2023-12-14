@@ -44,7 +44,9 @@ export const schema = createSchema({
 			Since: sinceResolver,
 			EpisodeType: episodeTypeResolver,
 			Query: {
-				podcast: (_, args: { id: string }) => getFullPodcast(args.id),
+				podcast: (_, args: { id: string }) => {
+					return getFullPodcast(args.id);
+				},
 				podcasts: (
 					_,
 					args: {
@@ -71,7 +73,9 @@ export const schema = createSchema({
 
 					return getPodcastsByCategory({ limit, category, language, cursor });
 				},
-				live: () => getLive(),
+				live: (_) => {
+					return getLive();
+				},
 				trending: (
 					_,
 					args: {

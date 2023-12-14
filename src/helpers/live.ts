@@ -10,7 +10,6 @@ export type PodcastLiveItem = Unpack<FeedObject["podcastLiveItems"]> & {
 };
 
 export const getLiveItem = async (id: number) => {
-	const liveItems: PodcastLiveItem[] = [];
 	const getUrl = await podcastDB.get(`${id}`);
 
 	if (!getUrl) return undefined;
@@ -21,18 +20,19 @@ export const getLiveItem = async (id: number) => {
 
 	if (!liveStream) return undefined;
 
-	for (const item of liveStream) {
+	return liveStream.map((item) => {
 		if (item.image === "" || typeof item.image === "undefined") {
-			liveItems.push({
+			return {
 				...item,
 				image: feed.image?.url,
 				feedTitle: feed.title,
 				feedId: id,
-			});
-		} else {
-			liveItems.push({ ...item, feedTitle: feed.title, feedId: id });
+			};
 		}
-	}
-
-	return liveItems;
+		return {
+			...item,
+			feedTitle: feed.title,
+			feedId: id,
+		};
+	});
 };

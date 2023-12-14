@@ -44,8 +44,8 @@ const items = /* GraphQL */ `
 		feedTitle: String
 		guid: String
 		title: String
-		start: Int!
-		end: Int
+		start: String!
+		end: String
 		link: String
 		status: String!
 		image: String

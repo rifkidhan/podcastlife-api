@@ -21,18 +21,6 @@ const job = new Cron(
 	}
 );
 console.log(job.name, job.nextRun()?.toString());
-// Deno.cron(
-// 	"update feeds",
-// 	"0 */2 * * *",
-// 	async () => {
-// 		console.log(`update feeds starting`);
-// 		await updateDB();
-// 		console.log("update finished");
-// 	},
-// 	{
-// 		backoffSchedule: [10000, 30000],
-// 	}
-// );
 
 const app = new Hono();
 

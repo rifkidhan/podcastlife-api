@@ -67,7 +67,11 @@ export const getPodcastsByCategory = async ({
 	const group = groupingCategories(category);
 
 	if (!group) {
-		throw new GraphQLError("category not found");
+		throw new GraphQLError(`category ${category} not found`, {
+			extensions: {
+				status: 404,
+			},
+		});
 	}
 
 	const parseGroup = group.map((item) => {
@@ -111,10 +115,22 @@ export const getFullPodcast = async (
 }> => {
 	const podcast = await podcastDB.get(id);
 
+	if (!podcast) {
+		throw new GraphQLError(`Podcast with id ${id} not found`, {
+			extensions: {
+				status: 404,
+			},
+		});
+	}
+
 	const items = await feedParser(podcast.url);
 
 	if (!items) {
-		throw new GraphQLError("Internal Server Error");
+		throw new GraphQLError("Internal Server Error", {
+			extensions: {
+				status: 500,
+			},
+		});
 	}
 
 	return {
@@ -140,6 +156,14 @@ export const getEpisode = async (guid: string, feedId: string) => {
 	const data = await podcastApi(
 		`/episodes/byguid?guid=${guid}&feedid=${feedId}`
 	).then((res) => res.json());
+
+	if (!data.status) {
+		throw new GraphQLError("Bad request", {
+			extensions: {
+				status: 400,
+			},
+		});
+	}
 
 	const episode = data.episode;
 
@@ -218,7 +242,11 @@ export const getTrending = async ({
 	const trending = await podcastApi(url);
 
 	if (!trending.ok) {
-		throw new GraphQLError("Internal Server Error");
+		throw new GraphQLError("Internal Server Error", {
+			extensions: {
+				status: 500,
+			},
+		});
 	}
 
 	const result = await trending.json().then((res) => res.feeds);
@@ -240,12 +268,16 @@ export const getLive = async () => {
 	const result = await podcastApi(`/episodes/live?max=100`);
 
 	if (!result.ok) {
-		throw new GraphQLError("Internal Server Error");
+		throw new GraphQLError("Internal Server Error", {
+			extensions: {
+				status: 500,
+			},
+		});
 	}
 
 	const items = await result.json().then((res) => res.items);
 
-	const fromIndex: PodcastLiveStream[] = [];
+	const fromIndex: number[] = [];
 	const idx = new Set();
 
 	const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
@@ -261,20 +293,19 @@ export const getLive = async () => {
 	});
 
 	for (const index of liveFromPodcastIndex) {
-		if (index.feedLanguage.includes("en" || "in")) {
-			fromIndex.push(index);
+		if (index.feedLanguage.includes("en" || "in") && index.categories) {
+			fromIndex.push(index.feedId);
 		}
 	}
 
 	const live: PodcastLiveItem[] = [];
 
-	await Promise.all(
-		fromIndex.map((item) =>
-			getLiveItem(item.feedId).then((res) =>
-				res?.map((item) => live.push(item))
-			)
-		)
-	);
+	for (const item of fromIndex) {
+		const liveItems = await getLiveItem(item);
+		if (liveItems) {
+			live.concat(liveItems);
+		}
+	}
 
 	return live;
 };
