@@ -20,7 +20,7 @@ const job = new Cron(
 		console.log("update finished");
 	}
 );
-console.log(job.name, job.nextRun()?.toLocaleString());
+console.log(job.name, job.nextRun()?.toString());
 // Deno.cron(
 // 	"update feeds",
 // 	"0 */2 * * *",
@@ -69,6 +69,9 @@ app.use("*", logger(logs));
 const yoga = createYoga({
 	schema,
 	graphiql: Deno.env.get("ENV") === "development",
+	batching: {
+		limit: 2,
+	},
 	plugins: [
 		useResponseCache({
 			session: (request) => request.headers.get("authorization"),
