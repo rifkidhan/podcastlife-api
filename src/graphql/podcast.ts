@@ -117,6 +117,7 @@ export const getFullPodcast = async (
 		throw new GraphQLError("Internal Server Error");
 	}
 
+	console.log(items.items);
 	return {
 		data: {
 			...podcast,
@@ -150,14 +151,14 @@ export const getEpisode = async (guid: string, feedId: string) => {
 			url: episode.enclosureUrl,
 			length: episode.enclosureLength,
 			type: episode.enclosureType,
-			image: episode.image ?? episode.feedImage,
-			chapters: episode.chaptersUrl,
-			value: {
-				type: episode.model.type,
-				method: episode.model.method,
-				suggested: episode.model.suggested,
-				recipients: episode.destinations,
-			},
+		},
+		image: episode.image ?? episode.feedImage,
+		chapters: episode.chaptersUrl,
+		value: {
+			type: episode.value?.model.type,
+			method: episode.value?.model.method,
+			suggested: episode.value?.model.suggested,
+			recipients: episode.value?.destinations,
 		},
 	};
 };
