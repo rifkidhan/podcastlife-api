@@ -4,15 +4,37 @@ import { bearerAuth, logger, prettyJSON } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
-import { cronUpdate } from "#/script/updateDb.ts";
+import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { createYoga } from "graphql-yoga";
 import schema from "#/graphql/schema.ts";
 import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
+import { Cron } from "https://deno.land/x/croner@8.0.0/dist/croner.js";
+
+const job = new Cron(
+	"0 */2 * * *",
+	{ name: "update feeds", timezone: "Asia/Jakarta" },
+	async () => {
+		console.log(`update feeds starting`);
+		await updateDB();
+		console.log("update finished");
+	}
+);
+console.log(job.name, job.nextRun()?.toLocaleString());
+// Deno.cron(
+// 	"update feeds",
+// 	"0 */2 * * *",
+// 	async () => {
+// 		console.log(`update feeds starting`);
+// 		await updateDB();
+// 		console.log("update finished");
+// 	},
+// 	{
+// 		backoffSchedule: [10000, 30000],
+// 	}
+// );
 
 const app = new Hono();
-
-cronUpdate();
 
 /**
  * make response json pretty

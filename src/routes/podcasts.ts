@@ -245,6 +245,42 @@ podcast.get("/live", async (c) => {
 	return c.json({ items: live }, STATUS_CODE.OK);
 });
 
+podcast.get("/episode", async (c) => {
+	const { guid, feedId } = c.req.query();
+
+	if (!guid || feedId) {
+		throw new HTTPException(STATUS_CODE.BadRequest, {
+			message: STATUS_TEXT[STATUS_CODE.BadRequest],
+		});
+	}
+	const data = await podcastApi(
+		`/episodes/byguid?guid=${guid}&feedid=${feedId}`
+	).then((res) => res.json());
+
+	const episode = data.episode;
+
+	return c.json(
+		{
+			...episode,
+			pubDate: episode.datePublished,
+			enclosure: {
+				url: episode.enclosureUrl,
+				length: episode.enclosureLength,
+				type: episode.enclosureType,
+			},
+			image: episode.image ?? episode.feedImage,
+			chapters: episode.chaptersUrl,
+			value: {
+				type: episode.value?.model.type,
+				method: episode.value?.model.method,
+				suggested: episode.value?.model.suggested,
+				recipients: episode.value?.destinations,
+			},
+		},
+		STATUS_CODE.OK
+	);
+});
+
 /**
  * Decline method
  */

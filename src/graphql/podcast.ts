@@ -117,7 +117,6 @@ export const getFullPodcast = async (
 		throw new GraphQLError("Internal Server Error");
 	}
 
-	console.log(items.items);
 	return {
 		data: {
 			...podcast,
