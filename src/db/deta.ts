@@ -27,6 +27,7 @@ export type Podcast = {
 	newestItemPublishTime: string;
 	oldestItemPublishTime: string;
 	tags: string[];
+	copyright?: string;
 	value?: Phase4Value;
 };
 

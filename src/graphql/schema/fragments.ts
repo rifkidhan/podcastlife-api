@@ -6,7 +6,7 @@ const recipient = /* GraphQL */ `
 		type: String!
 		address: String!
 		split: Int!
-		fee: Boolean!
+		fee: Boolean
 	}
 `;
 
@@ -65,7 +65,7 @@ export const transcript = /* GraphQL */ `
 	type Transcript {
 		type: String!
 		url: String!
-		language: String!
+		language: String
 	}
 `;
 

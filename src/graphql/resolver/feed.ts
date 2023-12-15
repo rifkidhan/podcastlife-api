@@ -38,6 +38,7 @@ const feed = {
 		newestItemPublishTime: (root: Podcast) => root.newestItemPublishTime,
 		oldestItemPublishTime: (root: Podcast) => root.oldestItemPublishTime,
 		tags: (root: Podcast) => root.tags.filter((n) => integer(n) === false),
+		copyright: (root: Podcast) => root.copyright,
 		value: (root: Podcast) => root.value,
 	},
 	TrendingFeed: {

@@ -19,6 +19,7 @@ const feed = /* GraphQL */ `
 		newestItemPublishTime: String!
 		oldestItemPublishTime: String!
 		tags: [String]!
+		copyright: String
 		value: Value
 	}
 

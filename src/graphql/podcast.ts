@@ -140,6 +140,7 @@ export const getFullPodcast = async (
 			newestItemPublishTime:
 				items.newestItemPubDate ?? podcast.newestItemPublishTime,
 			value: items.value,
+			copyright: items.copyright,
 		},
 		episodes: items.items,
 		live: (items.podcastLiveItems as PodcastLiveItem[]) || undefined,
@@ -180,7 +181,18 @@ export const getEpisode = async (guid: string, feedId: string) => {
 			type: episode.enclosureType,
 		},
 		image: episode.image ?? episode.feedImage,
-		chapters: episode.chaptersUrl,
+		podcastChapters: {
+			url: episode.chaptersUrl,
+		},
+		podcastTranscripts: episode.transcripts,
+		podcastSeason: {
+			number: episode.season,
+		},
+		podcastEpisode: {
+			number: episode.episode,
+		},
+		itunesEpisodeType: episode.episodeType,
+		podcastPeople: episode.persons,
 		value: {
 			type: episode.value?.model.type,
 			method: episode.value?.model.method,
