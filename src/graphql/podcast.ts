@@ -153,9 +153,12 @@ export const getFullPodcast = async (
  * @returns
  */
 export const getEpisode = async (guid: string, feedId: string) => {
-	const data = await podcastApi(
-		`/episodes/byguid?guid=${guid}&feedid=${feedId}`
-	).then((res) => res.json());
+	const [podcast, data] = await Promise.all([
+		podcastDB.get(feedId),
+		podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
+			(res) => res.json()
+		),
+	]);
 
 	if (!data.status) {
 		throw new GraphQLError("Bad request", {
@@ -169,7 +172,8 @@ export const getEpisode = async (guid: string, feedId: string) => {
 
 	return {
 		...episode,
-		pubDate: episode.datePublished,
+		pubDate: new Date(episode.datePublished),
+		author: podcast.author,
 		enclosure: {
 			url: episode.enclosureUrl,
 			length: episode.enclosureLength,

@@ -20,8 +20,8 @@ export const enclosure = /* GraphQL */ `
 
 export const value = /* GraphQL */ `
 	type Value {
-		type: String!
-		method: String!
+		type: String
+		method: String
 		recipients: [Recipient]
 		suggested: String
 	}

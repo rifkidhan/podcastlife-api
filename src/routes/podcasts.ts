@@ -1,6 +1,5 @@
 import { podcastApi } from "#/models/podcastapi.ts";
 import { feedParser } from "#/models/parsefeed.ts";
-import { FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
 import { groupingCategories, integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { Hono, HTTPException } from "hono";
@@ -263,9 +262,12 @@ podcast.get("/episode", async (c) => {
 			message: STATUS_TEXT[STATUS_CODE.BadRequest],
 		});
 	}
-	const data = await podcastApi(
-		`/episodes/byguid?guid=${guid}&feedid=${feedId}`
-	).then((res) => res.json());
+	const [podcast, data] = await Promise.all([
+		podcastDB.get(feedId),
+		podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
+			(res) => res.json()
+		),
+	]);
 
 	const episode = data.episode;
 
@@ -273,6 +275,7 @@ podcast.get("/episode", async (c) => {
 		{
 			...episode,
 			pubDate: episode.datePublished,
+			author: podcast.author,
 			enclosure: {
 				url: episode.enclosureUrl,
 				length: episode.enclosureLength,
