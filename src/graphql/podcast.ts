@@ -39,16 +39,22 @@ export const getPodcasts = async ({
 	}
 
 	let podcasts = await podcastDB.fetch(query, { limit });
+	let items = podcasts.items
 
 	if (cursor) {
 		podcasts = await podcastDB.fetch(query, { limit, last: cursor });
 	}
 
+	while(items.length < limit) {
+		podcasts = await podcastDB.fetch(query, { limit: limit - items.length, last: podcasts.last });
+		items = items.concat(podcasts.items)
+	}
+
 	return {
-		data: podcasts.items,
+		data: items,
 		info: {
 			cursor: podcasts.last,
-			count: podcasts.count,
+			count: podcasts.count === limit ? podcasts.count : items.length,
 		},
 	};
 };
@@ -87,16 +93,22 @@ export const getPodcastsByCategory = async ({
 	});
 
 	let podcasts = await podcastDB.fetch(parseGroup, { limit });
+	let items = podcasts.items
 
 	if (cursor) {
 		podcasts = await podcastDB.fetch(parseGroup, { limit, last: cursor });
 	}
 
+	while(items.length < limit) {
+		podcasts = await podcastDB.fetch(parseGroup, { limit: limit - items.length, last: podcasts.last });
+		items = items.concat(podcasts.items)
+	}
+
 	return {
-		data: podcasts.items,
+		data: items,
 		info: {
 			cursor: podcasts.last,
-			count: podcasts.count,
+			count: podcasts.count === limit ? podcasts.count : items.length,
 		},
 	};
 };

@@ -1,5 +1,5 @@
 import "env";
-import { Hono, HTTPException } from "hono/mod.ts";
+import { Hono, HTTPException } from "hono";
 import { bearerAuth, logger, prettyJSON } from "hono/middleware.ts";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
