@@ -10,107 +10,87 @@ import { Episode } from "https://esm.sh/podcast-partytime@4.7.0";
 export type { Podcast, PodcastLiveItem };
 
 export type PodcastFull = {
-	data: Podcast;
-	episodes: Episode[];
-	live?: PodcastLiveItem[];
+  data: Podcast;
+  episodes: Episode[];
+  live?: PodcastLiveItem[];
 };
 
 /**
  * get podcasts
  */
 export const getPodcasts = async ({
-	language,
-	tag,
-	limit = 50,
-	cursor,
+  language,
+  tag,
+  limit = 50,
+  cursor,
 }: {
-	language?: "en" | "in";
-	tag?: string;
-	limit?: number;
-	cursor?: string;
+  language?: "en" | "in";
+  tag?: string;
+  limit?: number;
+  cursor?: string;
 }) => {
-	let query = {};
+  let query = {};
 
-	if (language) {
-		query = Object.assign(query, { "language?contains": language });
-	}
-	if (tag) {
-		query = Object.assign(query, { "tags?contains": tag });
-	}
+  if (language) {
+    query = Object.assign(query, { "language?contains": language });
+  }
+  if (tag) {
+    query = Object.assign(query, { "tags?contains": tag });
+  }
 
-	let podcasts = await podcastDB.fetch(query, { limit });
-	let items = podcasts.items
+  const podcasts = await podcastDB.fetch(query, { limit, last: cursor });
 
-	if (cursor) {
-		podcasts = await podcastDB.fetch(query, { limit, last: cursor });
-	}
-
-	while(items.length < limit) {
-		podcasts = await podcastDB.fetch(query, { limit: limit - items.length, last: podcasts.last });
-		items = items.concat(podcasts.items)
-	}
-
-	return {
-		data: items,
-		info: {
-			cursor: podcasts.last,
-			count: podcasts.count === limit ? podcasts.count : items.length,
-		},
-	};
+  return {
+    data: podcasts.items,
+    info: {
+      cursor: podcasts.last,
+      count: podcasts.count,
+    },
+  };
 };
 
 export const getPodcastsByCategory = async ({
-	category,
-	limit = 50,
-	language,
-	cursor,
+  category,
+  limit = 50,
+  language,
+  cursor,
 }: {
-	category: string;
-	limit?: number;
-	language?: "en" | "in";
-	cursor?: string;
+  category: string;
+  limit?: number;
+  language?: "en" | "in";
+  cursor?: string;
 }) => {
-	const group = groupingCategories(category);
+  const group = groupingCategories(category);
 
-	if (!group) {
-		throw new GraphQLError(`category ${category} not found`, {
-			extensions: {
-				status: 404,
-			},
-		});
-	}
+  if (!group) {
+    throw new GraphQLError(`category ${category} not found`, {
+      extensions: {
+        status: 404,
+      },
+    });
+  }
 
-	const parseGroup = group.map((item) => {
-		let query = {
-			"tags?contains": item,
-		};
+  const parseGroup = group.map((item) => {
+    let query = {
+      "tags?contains": item,
+    };
 
-		if (language) {
-			query = Object.assign(query, { "language?contains": language });
-		}
+    if (language) {
+      query = Object.assign(query, { "language?contains": language });
+    }
 
-		return query;
-	});
+    return query;
+  });
 
-	let podcasts = await podcastDB.fetch(parseGroup, { limit });
-	let items = podcasts.items
+  const podcasts = await podcastDB.fetch(parseGroup, { limit, last: cursor });
 
-	if (cursor) {
-		podcasts = await podcastDB.fetch(parseGroup, { limit, last: cursor });
-	}
-
-	while(items.length < limit) {
-		podcasts = await podcastDB.fetch(parseGroup, { limit: limit - items.length, last: podcasts.last });
-		items = items.concat(podcasts.items)
-	}
-
-	return {
-		data: items,
-		info: {
-			cursor: podcasts.last,
-			count: podcasts.count === limit ? podcasts.count : items.length,
-		},
-	};
+  return {
+    data: podcasts.items,
+    info: {
+      cursor: podcasts.last,
+      count: podcasts.count,
+    },
+  };
 };
 
 /**
@@ -119,44 +99,44 @@ export const getPodcastsByCategory = async ({
  * @returns
  */
 export const getFullPodcast = async (
-	id: string
+  id: string
 ): Promise<{
-	data: Podcast;
-	episodes: Episode[];
-	live?: PodcastLiveItem[];
+  data: Podcast;
+  episodes: Episode[];
+  live?: PodcastLiveItem[];
 }> => {
-	const podcast = await podcastDB.get(id);
+  const podcast = await podcastDB.get(id);
 
-	if (!podcast) {
-		throw new GraphQLError(`Podcast with id ${id} not found`, {
-			extensions: {
-				status: 404,
-			},
-		});
-	}
+  if (!podcast) {
+    throw new GraphQLError(`Podcast with id ${id} not found`, {
+      extensions: {
+        status: 404,
+      },
+    });
+  }
 
-	const items = await feedParser(podcast.url);
+  const items = await feedParser(podcast.url);
 
-	if (!items) {
-		throw new GraphQLError("Internal Server Error", {
-			extensions: {
-				status: 500,
-			},
-		});
-	}
+  if (!items) {
+    throw new GraphQLError("Internal Server Error", {
+      extensions: {
+        status: 500,
+      },
+    });
+  }
 
-	return {
-		data: {
-			...podcast,
-			imageUrl: items.image?.url ?? podcast.imageUrl,
-			newestItemPublishTime:
-				items.newestItemPubDate ?? podcast.newestItemPublishTime,
-			value: items.value,
-			copyright: items.copyright,
-		},
-		episodes: items.items,
-		live: (items.podcastLiveItems as PodcastLiveItem[]) || undefined,
-	};
+  return {
+    data: {
+      ...podcast,
+      imageUrl: items.image?.url ?? podcast.imageUrl,
+      newestItemPublishTime:
+        items.newestItemPubDate ?? podcast.newestItemPublishTime,
+      value: items.value,
+      copyright: items.copyright,
+    },
+    episodes: items.items,
+    live: (items.podcastLiveItems as PodcastLiveItem[]) || undefined,
+  };
 };
 
 /**
@@ -166,177 +146,184 @@ export const getFullPodcast = async (
  * @returns
  */
 export const getEpisode = async (guid: string, feedId: string) => {
-	const [podcast, data] = await Promise.all([
-		podcastDB.get(feedId),
-		podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
-			(res) => res.json()
-		),
-	]);
+  const [podcast, data] = await Promise.all([
+    podcastDB.get(feedId),
+    podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
+      (res) => res.json()
+    ),
+  ]);
 
-	if (!data.status) {
-		throw new GraphQLError("Bad request", {
-			extensions: {
-				status: 400,
-			},
-		});
-	}
+  if (!data.status) {
+    throw new GraphQLError("Bad request", {
+      extensions: {
+        status: 400,
+      },
+    });
+  }
 
-	const episode = data.episode;
+  const episode = data.episode;
 
-	return {
-		...episode,
-		pubDate: new Date(episode.datePublished),
-		author: podcast.author,
-		enclosure: {
-			url: episode.enclosureUrl,
-			length: episode.enclosureLength,
-			type: episode.enclosureType,
-		},
-		image: episode.image ?? episode.feedImage,
-		podcastChapters: {
-			url: episode.chaptersUrl,
-		},
-		podcastTranscripts: episode.transcripts,
-		podcastSeason: {
-			number: episode.season,
-		},
-		podcastEpisode: {
-			number: episode.episode,
-		},
-		itunesEpisodeType: episode.episodeType,
-		podcastPeople: episode.persons,
-		value: {
-			type: episode.value?.model.type,
-			method: episode.value?.model.method,
-			suggested: episode.value?.model.suggested,
-			recipients: episode.value?.destinations,
-		},
-	};
+  return {
+    ...episode,
+    pubDate: new Date(episode.datePublished),
+    author: podcast.author,
+    enclosure: {
+      url: episode.enclosureUrl,
+      length: episode.enclosureLength,
+      type: episode.enclosureType,
+    },
+    image: episode.image ?? episode.feedImage,
+    podcastChapters: {
+      url: episode.chaptersUrl,
+    },
+    podcastTranscripts: episode.transcripts,
+    podcastSeason: {
+      number: episode.season,
+    },
+    podcastEpisode: {
+      number: episode.episode,
+    },
+    itunesEpisodeType: episode.episodeType,
+    podcastPeople: episode.persons,
+    value: {
+      type: episode.value?.model.type,
+      method: episode.value?.model.method,
+      suggested: episode.value?.model.suggested,
+      recipients: episode.value?.destinations,
+    },
+  };
 };
 
 /**
  * get trending podcast from podcastindex
  */
 export const getTrending = async ({
-	limit = 10,
-	cat,
-	lang,
-	from = "day",
+  limit = 10,
+  cat,
+  lang,
+  from = "day",
 }: {
-	limit?: number;
-	cat?: string;
-	lang?: "en" | "in";
-	from?: "current" | "day" | "week" | "month";
+  limit?: number;
+  cat?: string;
+  lang?: "en" | "in";
+  from?: "current" | "day" | "week" | "month";
 }): Promise<Podcast[]> => {
-	let url = `/podcasts/trending?max=${limit}&lang=${language(lang)}`;
-	const since = () => {
-		switch (from) {
-			case "current":
-				return Math.floor(Date.now() / 1000) - 1800;
-			case "day":
-				return Math.floor(Date.now() / 1000) - 86400;
-			case "week":
-				return Math.floor(Date.now() / 1000) - 604800;
-			case "month":
-				return Math.floor(Date.now() / 1000) - 2592000;
-			default:
-				return Math.floor(Date.now() / 1000) - 86400;
-		}
-	};
+  let url = `/podcasts/trending?max=${limit}&lang=${language(lang)}`;
+  const since = () => {
+    switch (from) {
+      case "current":
+        return Math.floor(Date.now() / 1000) - 1800;
+      case "day":
+        return Math.floor(Date.now() / 1000) - 86400;
+      case "week":
+        return Math.floor(Date.now() / 1000) - 604800;
+      case "month":
+        return Math.floor(Date.now() / 1000) - 2592000;
+      default:
+        return Math.floor(Date.now() / 1000) - 86400;
+    }
+  };
 
-	let categories = "";
+  let categories = "";
 
-	if (cat) {
-		const category = groupingCategories(cat);
-		if (category) {
-			categories = category
-				.map((tags) => {
-					const firstWord = tags.charAt(0).toUpperCase();
-					const rest = tags.slice(1);
+  if (cat) {
+    const category = groupingCategories(cat);
+    if (category) {
+      categories = category
+        .map((tags) => {
+          const firstWord = tags.charAt(0).toUpperCase();
+          const rest = tags.slice(1);
 
-					return firstWord + rest;
-				})
-				.toString();
-		}
-	}
-	if (from) {
-		url += "&since=" + since();
-	}
+          return firstWord + rest;
+        })
+        .toString();
+    }
+  }
+  if (from) {
+    url += "&since=" + since();
+  }
 
-	if (categories !== "") {
-		url += "&cat=" + categories;
-	}
+  if (categories !== "") {
+    url += "&cat=" + categories;
+  }
 
-	const trending = await podcastApi(url);
+  const trending = await podcastApi(url);
 
-	if (!trending.ok) {
-		throw new GraphQLError("Internal Server Error", {
-			extensions: {
-				status: 500,
-			},
-		});
-	}
+  if (!trending.ok) {
+    throw new GraphQLError("Internal Server Error", {
+      extensions: {
+        status: 500,
+      },
+    });
+  }
 
-	const result = await trending.json().then((res) => res.feeds);
+  const result = await trending.json().then((res) => res.feeds);
 
-	return result.map((item: any) => ({
-		...item,
-		tags: Object.entries(item.categories)
-			.join()
-			.toLowerCase()
-			.split(",")
-			.filter((n) => integer(n) === false),
-	}));
+  const feeds = result.map(async (item: any) => {
+    const data = await podcastDB.get(`${item.id}`);
+    return data;
+  });
+
+  // return result.map((item: any) => ({
+  // 	...item,
+  // 	tags: Object.entries(item.categories)
+  // 		.join()
+  // 		.toLowerCase()
+  // 		.split(",")
+  // 		.filter((n) => integer(n) === false),
+  // }));
+
+  return feeds;
 };
 
 /**
  * get livestream podcast
  */
 export const getLive = async () => {
-	const result = await podcastApi(`/episodes/live?max=100`);
+  const result = await podcastApi(`/episodes/live?max=100`);
 
-	if (!result.ok) {
-		throw new GraphQLError("Internal Server Error", {
-			extensions: {
-				status: 500,
-			},
-		});
-	}
+  if (!result.ok) {
+    throw new GraphQLError("Internal Server Error", {
+      extensions: {
+        status: 500,
+      },
+    });
+  }
 
-	const items = await result.json().then((res) => res.items);
+  const items = await result.json().then((res) => res.items);
 
-	const fromIndex: number[] = [];
-	const idx = new Set();
+  const fromIndex: number[] = [];
+  const idx = new Set();
 
-	const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
-		const isDuplicate = idx.has(obj.feedId);
+  const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
+    const isDuplicate = idx.has(obj.feedId);
 
-		idx.add(obj.feedId);
+    idx.add(obj.feedId);
 
-		if (!isDuplicate) {
-			return true;
-		}
+    if (!isDuplicate) {
+      return true;
+    }
 
-		return false;
-	});
+    return false;
+  });
 
-	for (const index of liveFromPodcastIndex) {
-		if (index.feedLanguage.includes("en" || "in") && index.categories) {
-			fromIndex.push(index.feedId);
-		}
-	}
+  for (const index of liveFromPodcastIndex) {
+    if (index.feedLanguage.includes("en" || "in") && index.categories) {
+      fromIndex.push(index.feedId);
+    }
+  }
 
-	let live: PodcastLiveItem[] = [];
+  let live: PodcastLiveItem[] = [];
 
-	await Promise.all(
-		fromIndex.map((item) =>
-			getLiveItem(item).then((res) => {
-				if (res) {
-					live = live.concat(res);
-				}
-			})
-		)
-	);
+  await Promise.all(
+    fromIndex.map((item) =>
+      getLiveItem(item).then((res) => {
+        if (res) {
+          live = live.concat(res);
+        }
+      })
+    )
+  );
 
-	return live;
+  return live;
 };

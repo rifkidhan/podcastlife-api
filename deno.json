@@ -8,7 +8,7 @@
 		"#/": "./src/",
 		"env": "https://deno.land/std@0.207.0/dotenv/load.ts",
 		"hono": "https://deno.land/x/hono@v3.11.8/mod.ts",
-		"hono/": "https://deno.land/x/hono@v3.11.8/",
+		"hono/middleware": "https://deno.land/x/hono@v3.11.8/middleware.ts",
 		"http-status": "https://deno.land/std@0.207.0/http/status.ts",
 		"graphql": "npm:graphql",
 		"graphql-yoga": "npm:graphql-yoga"

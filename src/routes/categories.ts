@@ -38,17 +38,7 @@ category.get("/:categoryName", async (c) => {
 		"tags?contains": item,
 	}));
 
-	let categories = await podcastDB.fetch(parseGroup, { limit: reqPage });
-	let items = categories.items
-
-	if (last) {
-		categories = await podcastDB.fetch(parseGroup, { limit: reqPage, last });
-	}
-
-	while(items.length < reqPage) {
-		categories = await podcastDB.fetch(parseGroup, { limit: reqPage - items.length, last: categories.last });
-		items = items.concat(categories.items)
-	}
+	const categories = await podcastDB.fetch(parseGroup, { limit: reqPage, last });
 
 	if (categories.items.length < 1) {
 		return c.notFound();
@@ -58,8 +48,8 @@ category.get("/:categoryName", async (c) => {
 		logs(cat);
 		return c.json(
 			{
-				data: items,
-				count: categories.count === reqPage ? categories.count : items.length,
+				data: categories.items,
+				count: categories.count,
 				last: categories.last
 			},
 			STATUS_CODE.OK
