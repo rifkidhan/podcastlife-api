@@ -1,0 +1,17 @@
+{
+  "id": "mig_cg261a1g02rnrvqe2vgg",
+  "parentID": "mig_cg2610f2lf9h6ke8mqq0",
+  "checksum": "1:3eb3c6dfc80fc0df6f40fb2b4dbb4b83be74ba84984bdf4d3c71e72bf4746074",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "itunesId",
+          "type": "int",
+          "unique": true
+        },
+        "table": "podcasts"
+      }
+    }
+  ]
+}

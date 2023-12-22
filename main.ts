@@ -10,7 +10,7 @@ import { createYoga } from "graphql-yoga";
 import schema from "#/graphql/schema.ts";
 import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
 import { Cron } from "https://deno.land/x/croner@8.0.0/dist/croner.js";
-import { initialize } from "https://deno.land/x/imagemagick_deno/mod.ts";
+import { initialize } from "https://deno.land/x/imagemagick_deno@0.0.26/mod.ts";
 
 const job = new Cron(
   "0 */2 * * *",

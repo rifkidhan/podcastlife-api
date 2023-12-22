@@ -1,0 +1,13 @@
+{
+  "id": "mig_cm2kjpas8qmbecrk4bd0",
+  "parentID": "mig_cm2kheis8qmbecrk4bbg",
+  "checksum": "1:4f2b798eb25ed16afa94d938c2a340b7e58679a415a9106bfd96ac8dd4f6a137",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "copyright",
+        "table": "podcast"
+      }
+    }
+  ]
+}

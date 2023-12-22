@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm2kds2s8qmbecrk4b9g",
+  "parentID": "mig_cm2kcqe19grg1uka90d0",
+  "checksum": "1:eff1e3bb8dad2ae7aa2965302399a1f301df2a487d906325dba72373cced3d5d",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "imageBlur",
+          "type": "text"
+        },
+        "table": "podcast"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm2kca619grg1uka90b0",
+  "parentID": "mig_cm2kc5619grg1uka90a0",
+  "checksum": "1:88ee72c3b549b34e49aae6097c99bfb9504752fd4ab53a603d54a81ea0792415",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "description",
+          "type": "text"
+        },
+        "table": "podcast"
+      }
+    }
+  ]
+}

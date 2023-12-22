@@ -1,0 +1,16 @@
+{
+  "id": "mig_cm2kheis8qmbecrk4bbg",
+  "parentID": "mig_cm2khais8qmbecrk4bag",
+  "checksum": "1:39c5e900cb628809f0eeb9fa99d07f97340c49676a0baed818a1a4e013c6203f",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "copyright",
+          "type": "text"
+        },
+        "table": "podcast"
+      }
+    }
+  ]
+}

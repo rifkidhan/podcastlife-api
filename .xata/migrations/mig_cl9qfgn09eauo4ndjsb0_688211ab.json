@@ -1,0 +1,13 @@
+{
+  "id": "mig_cl9qfgn09eauo4ndjsb0",
+  "parentID": "mig_cl9orhi4qp2onkp3ecc0",
+  "checksum": "1:688211ab526ad25801fdaa0c26b0731b88a5b541779c5cd40b3480a985158bee",
+  "operations": [
+    {
+      "renameTable": {
+        "newName": "podcastlife",
+        "oldName": "podcastindex"
+      }
+    }
+  ]
+}

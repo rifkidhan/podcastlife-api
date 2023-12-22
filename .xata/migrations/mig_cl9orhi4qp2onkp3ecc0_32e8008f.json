@@ -1,0 +1,354 @@
+{
+  "id": "mig_cl9orhi4qp2onkp3ecc0",
+  "parentID": "mig_cl74lk8c4l9ri3sglu90",
+  "checksum": "1:32e8008ff9d53985e7671461d304456756c7c040f7593c818253318777d604f8",
+  "operations": [
+    {
+      "addTable": {
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "url",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "title",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "lastUpdate",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "link",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "lastHttpStatus",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "dead",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "contentType",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "itunesId",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "originalUrl",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "itunesAuthor",
+          "type": "text"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "itunesOwnerName",
+          "type": "text"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "explicit",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "imageUrl",
+          "type": "text"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "itunesType",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "generator",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "newestItemPubdate",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "language",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "oldestItemPubdate",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "episodeCount",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "popularityScore",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "priority",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "createdOn",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "updateFrequency",
+          "type": "int"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "chash",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "host",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "newestEnclosureUrl",
+          "type": "text"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "podcastGuid",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "description",
+          "type": "text"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category1",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category2",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category3",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category4",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category5",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category6",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category7",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category8",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category9",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    },
+    {
+      "addColumn": {
+        "column": {
+          "name": "category10",
+          "type": "string"
+        },
+        "table": "podcastindex"
+      }
+    }
+  ]
+}

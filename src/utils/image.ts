@@ -3,7 +3,7 @@ import {
   MagickFormat,
   MagickGeometry,
   Percentage,
-} from "https://deno.land/x/imagemagick_deno/mod.ts";
+} from "https://deno.land/x/imagemagick_deno@0.0.26/mod.ts";
 
 const getData = (data: Uint8Array) => {
   return new Promise<string>((resolve) => {
@@ -37,7 +37,6 @@ export const getBlurData = async (url: string) => {
   const data = new Uint8Array(res);
 
   const resData = await getData(data);
-  console.log(resData);
 
   return resData;
 };

@@ -1,0 +1,18 @@
+{
+  "id": "mig_cm2ke5u19grg1uka90e0",
+  "parentID": "mig_cm2kds2s8qmbecrk4b9g",
+  "checksum": "1:d5c1db22838615ce9805dc71dd1d72e09b0c5d41fe06c6efd69b539f46072b7b",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "contentType",
+          "type": "string",
+          "notNull": true,
+          "defaultValue": "application/json"
+        },
+        "table": "podcast"
+      }
+    }
+  ]
+}

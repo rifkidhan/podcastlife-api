@@ -1,0 +1,16 @@
+{
+  "id": "mig_cg261qhg02rnrvqe2vh0",
+  "parentID": "mig_cg261i5m8s493qvnb5vg",
+  "checksum": "1:34bc0ea45663045fe59c443df05fe49665b7f3284217086ab146b7c4dbcfb44d",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "type",
+          "type": "int"
+        },
+        "table": "podcasts"
+      }
+    }
+  ]
+}

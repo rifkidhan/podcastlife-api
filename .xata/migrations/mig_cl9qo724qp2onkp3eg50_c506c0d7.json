@@ -1,0 +1,16 @@
+{
+  "id": "mig_cl9qo724qp2onkp3eg50",
+  "parentID": "mig_cl9qnv709eauo4ndjtu0",
+  "checksum": "1:c506c0d7e60474eda0310ce2077daf594ca37191d3c225a99773fe3970fab6c6",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "categories",
+          "type": "multiple"
+        },
+        "table": "podcastlife"
+      }
+    }
+  ]
+}

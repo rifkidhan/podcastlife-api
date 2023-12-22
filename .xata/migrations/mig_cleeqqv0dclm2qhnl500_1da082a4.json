@@ -1,0 +1,13 @@
+{
+  "id": "mig_cleeqqv0dclm2qhnl500",
+  "parentID": "mig_cleeqp96gvdlaviqptvg",
+  "checksum": "1:1da082a4ccfb38999e22b84e61e7d7f24ad7a77615306ba8ee9f53cb1f09ac90",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "updateFrequency",
+        "table": "podcastlife"
+      }
+    }
+  ]
+}

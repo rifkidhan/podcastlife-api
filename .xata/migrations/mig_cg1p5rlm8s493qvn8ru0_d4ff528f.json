@@ -1,0 +1,12 @@
+{
+  "id": "mig_cg1p5rlm8s493qvn8ru0",
+  "parentID": "mig_cg1p5o6kdjlkvtg0vugg",
+  "checksum": "1:d4ff528f7895092d7b7e7c6d00e803864853cddc13ceaf31ff444641d5e292f4",
+  "operations": [
+    {
+      "addTable": {
+        "table": "podcasts"
+      }
+    }
+  ]
+}

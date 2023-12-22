@@ -1,0 +1,13 @@
+{
+  "id": "mig_cl9qnv709eauo4ndjtu0",
+  "parentID": "mig_cl9qnt24qp2onkp3eg00",
+  "checksum": "1:7c3baf6e6a42fc58d9d4f1933fca14a1037dce22bf10589d73325b5cddf87bd7",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "newestEnclosureUrl",
+        "table": "podcastlife"
+      }
+    }
+  ]
+}

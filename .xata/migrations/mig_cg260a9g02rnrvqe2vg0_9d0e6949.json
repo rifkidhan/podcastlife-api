@@ -1,0 +1,16 @@
+{
+  "id": "mig_cg260a9g02rnrvqe2vg0",
+  "parentID": "mig_cg2606lm8s493qvnb5pg",
+  "checksum": "1:9d0e69493f993282a6421c073a592e1cdcec380c2321df28f41bafc7ef8a2f81",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "image",
+          "type": "string"
+        },
+        "table": "podcasts"
+      }
+    }
+  ]
+}

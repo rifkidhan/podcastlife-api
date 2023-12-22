@@ -3,6 +3,7 @@
   "packages": {
     "specifiers": {
       "npm:@graphql-yoga/plugin-response-cache": "npm:@graphql-yoga/plugin-response-cache@3.1.3_graphql@16.8.1_graphql-yoga@5.0.2__graphql@16.8.1",
+      "npm:@xata.io/client@latest": "npm:@xata.io/client@0.28.3_typescript@5.3.3",
       "npm:graphql": "npm:graphql@16.8.1",
       "npm:graphql-yoga": "npm:graphql-yoga@5.0.2_graphql@16.8.1"
     },
@@ -143,6 +144,12 @@
           "tslib": "tslib@2.6.2"
         }
       },
+      "@xata.io/client@0.28.3_typescript@5.3.3": {
+        "integrity": "sha512-aaXct/xWiYqHyFx2srMCnFDGrKvDA5fa6NEkFGzTHXQdYTai5hTQXcraPHxVHGlPUV3dapQWsguR4YJQugDpqQ==",
+        "dependencies": {
+          "typescript": "typescript@5.3.3"
+        }
+      },
       "busboy@1.6.0": {
         "integrity": "sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==",
         "dependencies": {
@@ -204,6 +211,10 @@
       },
       "tslib@2.6.2": {
         "integrity": "sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==",
+        "dependencies": {}
+      },
+      "typescript@5.3.3": {
+        "integrity": "sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==",
         "dependencies": {}
       },
       "urlpattern-polyfill@9.0.0": {

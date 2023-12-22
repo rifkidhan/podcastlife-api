@@ -1,0 +1,13 @@
+{
+  "id": "mig_cm2kk75np4b6fc4cj6q0",
+  "parentID": "mig_cm2kjpas8qmbecrk4bd0",
+  "checksum": "1:b17b8e189a1dc82f6d978d4a68e0bd95c215a021831dbaaa2c81222dbeda5f88",
+  "operations": [
+    {
+      "removeColumn": {
+        "column": "url",
+        "table": "podcast"
+      }
+    }
+  ]
+}
