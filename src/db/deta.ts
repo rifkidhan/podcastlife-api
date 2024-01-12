@@ -7,6 +7,8 @@ export const categoryDB = deta.Base("category");
 
 export const podcastDB = deta.Base("podcast");
 
+export const drive = deta.Drive("resizer");
+
 export type Podcast = {
   key: string;
   podcastGuid: string;

@@ -7,8 +7,8 @@
   "imports": {
     "#/": "./src/",
     "env": "https://deno.land/std@0.207.0/dotenv/load.ts",
-    "hono": "https://deno.land/x/hono@v3.11.9/mod.ts",
-    "hono/middleware": "https://deno.land/x/hono@v3.11.9/middleware.ts",
+    "hono": "https://deno.land/x/hono@v3.12.0/mod.ts",
+    "hono/middleware": "https://deno.land/x/hono@v3.12.0/middleware.ts",
     "http-status": "https://deno.land/std@0.207.0/http/status.ts",
     "graphql": "npm:graphql",
     "graphql-yoga": "npm:graphql-yoga"

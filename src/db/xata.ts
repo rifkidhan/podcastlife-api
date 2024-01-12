@@ -8,75 +8,83 @@ import type {
 
 const tables = [
   {
-    name: "podcast",
+    name: "child_category",
     columns: [
-      { name: "title", type: "string", notNull: true, defaultValue: "title" },
-      {
-        name: "podcastGuid",
-        type: "string",
-        notNull: true,
-        defaultValue: "guid",
-      },
-      { name: "link", type: "text" },
-      { name: "originalUrl", type: "text" },
-      { name: "description", type: "text" },
-      { name: "author", type: "string" },
-      { name: "ownerName", type: "string" },
-      { name: "imageUrl", type: "text" },
-      { name: "imageBlur", type: "text" },
-      {
-        name: "contentType",
-        type: "string",
-        notNull: true,
-        defaultValue: "application/json",
-      },
-      { name: "itunesId", type: "string" },
-      { name: "itunesType", type: "string" },
-      { name: "generator", type: "string" },
-      { name: "language", type: "string", notNull: true, defaultValue: "en" },
-      { name: "explicit", type: "bool", notNull: true, defaultValue: "false" },
-      {
-        name: "newestItemPublishTime",
-        type: "int",
-        notNull: true,
-        defaultValue: "0",
-      },
-      {
-        name: "oldestItemPublishTime",
-        type: "int",
-        notNull: true,
-        defaultValue: "0",
-      },
-      {
-        name: "url",
-        type: "text",
-        notNull: true,
-        defaultValue: "http://localhost:8000",
-      },
-      { name: "tags", type: "link", link: { table: "category" } },
+      { name: "title", type: "string", notNull: true, defaultValue: "" },
+      { name: "parent", type: "link", link: { table: "categories" } },
     ],
   },
   {
-    name: "category",
+    name: "categories",
     columns: [
-      { name: "title", type: "string", notNull: true, defaultValue: "title" },
+      { name: "title", type: "string", notNull: true, defaultValue: "" },
     ],
-    revLinks: [{ column: "tags", table: "podcast" }],
+    revLinks: [
+      { column: "parent", table: "child_category" },
+      { column: "category", table: "category_podcast" },
+    ],
+  },
+  {
+    name: "podcasts",
+    columns: [
+      { name: "title", type: "string", notNull: true, defaultValue: "" },
+      { name: "url", type: "string", unique: true },
+      { name: "link", type: "string" },
+      { name: "originalUrl", type: "string", notNull: true, defaultValue: "" },
+      { name: "description", type: "text" },
+      { name: "language", type: "string", notNull: true, defaultValue: "" },
+      { name: "image", type: "text" },
+      { name: "podcastGuid", type: "string" },
+      { name: "itunesId", type: "int" },
+      { name: "itunesType", type: "string" },
+      { name: "explicit", type: "bool", notNull: true, defaultValue: "false" },
+      { name: "author", type: "text" },
+      { name: "owner", type: "text" },
+      {
+        name: "newestItemPubdate",
+        type: "int",
+        notNull: true,
+        defaultValue: "0",
+      },
+      { name: "tags", type: "multiple" },
+      {
+        name: "oldestItemPubdate",
+        type: "int",
+        notNull: true,
+        defaultValue: "0",
+      },
+    ],
+    revLinks: [{ column: "podcast", table: "category_podcast" }],
+  },
+  {
+    name: "category_podcast",
+    columns: [
+      { name: "category", type: "link", link: { table: "categories" } },
+      { name: "podcast", type: "link", link: { table: "podcasts" } },
+    ],
   },
 ] as const;
 
 export type SchemaTables = typeof tables;
 export type InferredTypes = SchemaInference<SchemaTables>;
 
-export type Podcast = InferredTypes["podcast"];
-export type PodcastRecord = Podcast & XataRecord;
+export type ChildCategory = InferredTypes["child_category"];
+export type ChildCategoryRecord = ChildCategory & XataRecord;
 
-export type Category = InferredTypes["category"];
-export type CategoryRecord = Category & XataRecord;
+export type Categories = InferredTypes["categories"];
+export type CategoriesRecord = Categories & XataRecord;
+
+export type Podcasts = InferredTypes["podcasts"];
+export type PodcastsRecord = Podcasts & XataRecord;
+
+export type CategoryPodcast = InferredTypes["category_podcast"];
+export type CategoryPodcastRecord = CategoryPodcast & XataRecord;
 
 export type DatabaseSchema = {
-  podcast: PodcastRecord;
-  category: CategoryRecord;
+  child_category: ChildCategoryRecord;
+  categories: CategoriesRecord;
+  podcasts: PodcastsRecord;
+  category_podcast: CategoryPodcastRecord;
 };
 
 const DatabaseClient = buildClient();

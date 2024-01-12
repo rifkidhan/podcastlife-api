@@ -1,6 +1,6 @@
 import "env";
 import { Hono, HTTPException } from "hono";
-import { bearerAuth, logger, prettyJSON } from "hono/middleware";
+import { bearerAuth, logger, prettyJSON, compress } from "hono/middleware";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import { STATUS_CODE } from "http-status";
@@ -10,7 +10,6 @@ import { createYoga } from "graphql-yoga";
 import schema from "#/graphql/schema.ts";
 import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
 import { Cron } from "https://deno.land/x/croner@8.0.0/dist/croner.js";
-import { initialize } from "https://deno.land/x/imagemagick_deno@0.0.26/mod.ts";
 
 const job = new Cron(
   "0 */2 * * *",
@@ -23,8 +22,6 @@ const job = new Cron(
 );
 console.log(job.name, job.nextRun()?.toString());
 
-await initialize();
-
 const app = new Hono();
 
 /**
@@ -33,10 +30,19 @@ const app = new Hono();
  */
 app.use("/v1/*", prettyJSON());
 
+app.use("*", logger(logs));
+
 /**
  * Token
  */
-app.use("/*", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
+app.use("/v1/*", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
+app.use("/graphql", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
+app.use(
+  "/v1/*",
+  compress({
+    encoding: "gzip",
+  })
+);
 
 /**
  * Response for not found
@@ -55,7 +61,6 @@ app.onError((err, c) => {
   console.error(err);
   return c.json({ message: err.message }, STATUS_CODE.InternalServerError);
 });
-app.use("*", logger(logs));
 
 const yoga = createYoga({
   schema,
