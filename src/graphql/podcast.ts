@@ -292,7 +292,7 @@ export const getLive = async () => {
 
   const items = await result.json().then((res) => res.items);
 
-  const fromIndex: number[] = [];
+  const fromIndex: string[] = [];
   const idx = new Set();
 
   const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
@@ -309,7 +309,7 @@ export const getLive = async () => {
 
   for (const index of liveFromPodcastIndex) {
     if (index.feedLanguage.includes("en" || "in") && index.categories) {
-      fromIndex.push(index.feedId);
+      fromIndex.push(String(index.feedId));
     }
   }
 

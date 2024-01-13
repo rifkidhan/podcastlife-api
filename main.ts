@@ -9,18 +9,12 @@ import { logs } from "#/middlerwares/log.ts";
 import { createYoga } from "graphql-yoga";
 import schema from "#/graphql/schema.ts";
 import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
-import { Cron } from "https://deno.land/x/croner@8.0.0/dist/croner.js";
 
-const job = new Cron(
-  "0 */2 * * *",
-  { name: "update feeds", timezone: "Asia/Jakarta" },
-  async () => {
-    console.log(`update feeds starting`);
-    await updateDB();
-    console.log("update finished");
-  }
-);
-console.log(job.name, job.nextRun()?.toString());
+Deno.cron("feeds update", "0 */2 * * *", async () => {
+  console.log(`update feeds starting`);
+  await updateDB();
+  console.log("update finished");
+});
 
 const app = new Hono();
 

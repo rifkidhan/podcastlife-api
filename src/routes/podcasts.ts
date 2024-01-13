@@ -46,6 +46,13 @@ podcast.get(
 );
 
 podcast.get(
+  "/recent",
+  cache({
+    cacheControl: "public, max-age=7200, stale-while-revalidate=1800",
+  })
+);
+
+podcast.get(
   "/episode",
   cache({
     cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
@@ -70,7 +77,11 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
     logs("get full podcast data from : ", id);
     return c.json(
       {
-        data,
+        data: {
+          ...data,
+          value: items?.value,
+          copyright: items?.copyright,
+        },
         episodes: items?.items,
         lives: items?.podcastLiveItems,
       },
@@ -82,36 +93,8 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
 });
 
 /**
- * Get podcast url and full info from parser
- */
-podcast.get("/podcast/info/:feedId", async (c) => {
-  const id = c.req.param("feedId");
-
-  const data = await xata.db.podcasts.read(id);
-
-  if (!data || !data.url) {
-    return c.notFound();
-  }
-
-  const items = await feedParser(data.url);
-
-  try {
-    logs("get info podcast data from : ", id);
-    return c.json(
-      {
-        items,
-      },
-      STATUS_CODE.OK
-    );
-  } catch (error) {
-    throw error;
-  }
-});
-
-/**
  * Get Episodes from request url
  */
-
 podcast.get("/podcast/url", async (c) => {
   const { url } = c.req.query();
 
@@ -139,7 +122,6 @@ podcast.get("/podcast/url", async (c) => {
 /**
  * Get trending podcast from podcastindex
  */
-
 podcast.get("/trending", async (c) => {
   const { max, cat } = c.req.query();
 
@@ -169,7 +151,7 @@ podcast.get("/trending", async (c) => {
     const trending = await podcastApi(url);
     if (trending.ok) {
       const data = await trending.json();
-      return c.json({ data }, STATUS_CODE.OK);
+      return c.json({ data: data.feeds }, STATUS_CODE.OK);
     }
     errorPodcastApi(trending.status);
   } catch (error) {
@@ -279,6 +261,32 @@ podcast.get("/live", async (c) => {
   );
 
   return c.json({ items: live }, STATUS_CODE.OK);
+});
+
+/**
+ * get recent update podcast
+ */
+podcast.get("/recent", async (c) => {
+  const data = await xata.db.podcasts
+    .select([
+      "id",
+      "title",
+      "newestItemPubdate",
+      "description",
+      "image",
+      "explicit",
+      "owner",
+      "author",
+    ])
+    .sort("newestItemPubdate", "desc")
+    .getMany();
+
+  return c.json(
+    {
+      data: data.toSerializable(),
+    },
+    STATUS_CODE.OK
+  );
 });
 
 podcast.get("/episode", async (c) => {
