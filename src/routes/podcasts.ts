@@ -9,6 +9,7 @@ import { PodcastLiveStream } from "#/types.ts";
 import { getLiveItem, PodcastLiveItem } from "#/helpers/live.ts";
 import { cache } from "#/middlerwares/cache.ts";
 import { getXataClient } from "#/db/xata.ts";
+import { transaction } from "#/db/xataTransaction.ts";
 
 const now = Math.floor(Date.now() / 1000) - 86400;
 
@@ -78,12 +79,14 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
     return c.json(
       {
         data: {
-          ...data,
-          value: items?.value,
-          copyright: items?.copyright,
+          feed: {
+            ...data,
+            value: items?.value,
+            copyright: items?.copyright,
+          },
+          episodes: items?.items,
+          lives: items?.podcastLiveItems,
         },
-        episodes: items?.items,
-        lives: items?.podcastLiveItems,
       },
       STATUS_CODE.OK
     );
@@ -110,7 +113,7 @@ podcast.get("/podcast/url", async (c) => {
     logs("get episodes url data from : ", url);
     return c.json(
       {
-        items,
+        data: items,
       },
       STATUS_CODE.OK
     );
@@ -151,7 +154,37 @@ podcast.get("/trending", async (c) => {
     const trending = await podcastApi(url);
     if (trending.ok) {
       const data = await trending.json();
-      return c.json({ data: data.feeds }, STATUS_CODE.OK);
+      const reqBody = JSON.stringify({
+        operations: data.feeds.map((item: any) => {
+          return {
+            get: {
+              table: "podcasts",
+              id: String(item.id),
+              columns: [
+                "id",
+                "title",
+                "explicit",
+                "author",
+                "owner",
+                "newestItemPubdate",
+                "image",
+                "description",
+                "tags",
+              ],
+            },
+          };
+        }),
+      });
+
+      const fromDB = await transaction(reqBody).then((res) =>
+        res
+          .filter((item: any) => typeof item.columns.id === "string")
+          .map((item: any) => {
+            return item.columns;
+          })
+      );
+
+      return c.json({ data: fromDB }, STATUS_CODE.OK);
     }
     errorPodcastApi(trending.status);
   } catch (error) {
@@ -260,7 +293,7 @@ podcast.get("/live", async (c) => {
     )
   );
 
-  return c.json({ items: live }, STATUS_CODE.OK);
+  return c.json({ data: live }, STATUS_CODE.OK);
 });
 
 /**
@@ -308,21 +341,23 @@ podcast.get("/episode", async (c) => {
 
   return c.json(
     {
-      ...episode,
-      pubDate: episode.datePublished,
-      author: podcast?.author,
-      enclosure: {
-        url: episode.enclosureUrl,
-        length: episode.enclosureLength,
-        type: episode.enclosureType,
-      },
-      image: episode.image ?? episode.feedImage,
-      chapters: episode.chaptersUrl,
-      value: {
-        type: episode.value?.model.type,
-        method: episode.value?.model.method,
-        suggested: episode.value?.model.suggested,
-        recipients: episode.value?.destinations,
+      data: {
+        ...episode,
+        pubDate: episode.datePublished,
+        author: podcast?.author,
+        enclosure: {
+          url: episode.enclosureUrl,
+          length: episode.enclosureLength,
+          type: episode.enclosureType,
+        },
+        image: episode.image ?? episode.feedImage,
+        chapters: episode.chaptersUrl,
+        value: {
+          type: episode.value?.model.type,
+          method: episode.value?.model.method,
+          suggested: episode.value?.model.suggested,
+          recipients: episode.value?.destinations,
+        },
       },
     },
     STATUS_CODE.OK

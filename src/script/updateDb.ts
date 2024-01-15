@@ -2,10 +2,18 @@ import { podcastApi } from "#/models/podcastapi.ts";
 import { integer, groupingCategories, language } from "#/helpers/matching.ts";
 import { getXataClient, DatabaseSchema, Podcasts } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
+import { transaction } from "#/db/xataTransaction.ts";
 
-const detaUrl = `${Deno.env.get("DETA_URL")}/podcast`;
-
-const detaKey = Deno.env.get("DETA_KEY") as string;
+interface FeedUpdate {
+  id: string;
+  url: string;
+  title: string;
+  newestItemPublishTime: number;
+  oldestItemPublishTime: number;
+  itunesId?: number;
+  image?: string;
+  language: string;
+}
 
 const xata = getXataClient();
 
@@ -38,72 +46,26 @@ export const updateDB = async () => {
   console.log("done====>>>>>");
 };
 
-export const deleteDeadPodcast = async () => {
-  console.log("fetch dead podcast");
-  const data = await podcastApi("/podcasts/dead").then((res) => res.json());
-
-  console.log("fetch done");
-  for (const feed of data.feeds) {
-    await fetch(detaUrl + "/items/" + feed.id, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": detaKey,
-      },
-    });
-
-    console.log("remove ", feed.id);
-  }
-
-  console.log("++++remove complete++++");
-};
-
-interface FeedUpdate {
-  id: string;
-  url: string;
-  title: string;
-  newestItemPublishTime: number;
-  oldestItemPublishTime: number;
-  itunesId?: number;
-  image?: string;
-  language: string;
-}
-
 const checkDataExist = async (feeds: FeedUpdate[]) => {
-  const url = `${Deno.env.get("XATA_DATABASE_URL")}:${Deno.env.get(
-    "XATA_BRANCH"
-  )}/transaction`;
-
-  const key = Deno.env.get("XATA_API_KEY");
-
   try {
-    const trxData = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        operations: feeds.map((item) => {
-          return {
-            get: {
-              table: "podcasts",
-              id: item.id,
-              columns: ["id"],
-            },
-          };
-        }),
+    const reqBody = JSON.stringify({
+      operations: feeds.map((item) => {
+        return {
+          get: {
+            table: "podcasts",
+            id: item.id,
+            columns: ["id"],
+          },
+        };
       }),
     });
 
-    const data = await trxData.json();
+    const data = await transaction(reqBody);
 
-    const result = data.results
+    const result = data
       .filter((item: any) => typeof item.columns.id === "string")
       .map((item: any) => {
-        if (item.columns.id) {
-          return item.columns.id as string;
-        }
+        return item.columns.id as string;
       });
 
     const toBeUpdate: FeedUpdate[] = [];
