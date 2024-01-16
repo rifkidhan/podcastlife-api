@@ -122,9 +122,9 @@ podcast.get("/trending", async (c) => {
   };
 
   let query = {
-    max: max ? Number(max) : 10,
+    max: max ? max : String(10),
     lang: language(),
-    since: since(),
+    since: String(since()),
   };
 
   if (category.length > 0) {
@@ -139,12 +139,15 @@ podcast.get("/trending", async (c) => {
     query = Object.assign(query, { cat: categories });
   }
 
-  const trending = await podcastApi(`/podcasts/trending?${query}`);
+  const searchParams = new URLSearchParams(query);
+
+  const trending = await podcastApi(`/podcasts/trending?${searchParams}`);
   if (!trending.ok) {
     errorPodcastApi(trending.status);
   }
 
   const data = await trending.json();
+
   const reqBody = JSON.stringify({
     operations: data.feeds.map((item: any) => {
       return {
