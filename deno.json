@@ -2,15 +2,13 @@
   "tasks": {
     "dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
     "start": "deno run --allow-read --allow-env --allow-net main.ts",
-    "seed": "deno run --allow-read --allow-env --allow-net src/script/cat.ts"
+    "rmpodcast": "deno run --allow-read --allow-env --allow-net src/script/removeDeadPodcast.ts"
   },
   "imports": {
     "#/": "./src/",
     "env": "https://deno.land/std@0.207.0/dotenv/load.ts",
     "hono": "https://deno.land/x/hono@v3.12.0/mod.ts",
     "hono/middleware": "https://deno.land/x/hono@v3.12.0/middleware.ts",
-    "http-status": "https://deno.land/std@0.207.0/http/status.ts",
-    "graphql": "npm:graphql",
-    "graphql-yoga": "npm:graphql-yoga"
+    "http-status": "https://deno.land/std@0.207.0/http/status.ts"
   }
 }

@@ -55,6 +55,7 @@ category.get("/:categoryName", async (c) => {
     })
     .sort("podcast.newestItemPubdate", "desc")
     .getPaginated({
+      consistency: "eventual",
       pagination: {
         size: reqPage,
         before,
@@ -62,22 +63,15 @@ category.get("/:categoryName", async (c) => {
       },
     });
 
-  if (categories.records.length < 1) {
-    return c.notFound();
-  }
+  logs(cat);
 
-  try {
-    logs(cat);
-    return c.json(
-      {
-        data: categories.records.toSerializable(),
-        meta: categories.meta,
-      },
-      STATUS_CODE.OK
-    );
-  } catch (error) {
-    throw error;
-  }
+  return c.json(
+    {
+      data: categories.records.map((item) => item.podcast),
+      meta: categories.meta,
+    },
+    STATUS_CODE.OK
+  );
 });
 
 /**

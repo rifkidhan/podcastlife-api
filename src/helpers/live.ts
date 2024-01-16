@@ -1,8 +1,5 @@
 import { FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
 import { feedParser } from "#/models/parsefeed.ts";
-import { getXataClient } from "#/db/xata.ts";
-
-const xata = getXataClient();
 
 type Unpack<T> = T extends (infer U)[] ? U : T;
 
@@ -11,13 +8,14 @@ export type PodcastLiveItem = Unpack<FeedObject["podcastLiveItems"]> & {
   feedTitle: string;
 };
 
-export const getLiveItem = async (id: string) => {
-  const getUrl = await xata.db.podcasts.read(id);
+export interface GetLiveParams {
+  id: string;
+  author?: string;
+  url: string;
+}
 
-  if (!getUrl || !getUrl.url) return undefined;
-
-  const author = typeof getUrl.author === "string" ? getUrl.author : undefined;
-  const feed = await feedParser(getUrl.url);
+export const getLiveItem = async ({ id, author, url }: GetLiveParams) => {
+  const feed = await feedParser(url);
 
   const liveStream = feed?.podcastLiveItems;
 
@@ -33,6 +31,7 @@ export const getLiveItem = async (id: string) => {
         author: item.author ?? feed.author ?? author,
       };
     }
+
     return {
       ...item,
       feedTitle: feed.title,

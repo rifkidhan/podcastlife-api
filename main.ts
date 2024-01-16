@@ -1,20 +1,25 @@
 import "env";
 import { Hono, HTTPException } from "hono";
-import { bearerAuth, logger, prettyJSON, compress } from "hono/middleware";
+import {
+  bearerAuth,
+  logger,
+  prettyJSON,
+  compress,
+  etag,
+  serveStatic,
+} from "hono/middleware";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
+import episodes from "#/routes/episodes.ts";
 import { STATUS_CODE } from "http-status";
 import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
-import { createYoga } from "graphql-yoga";
-import schema from "#/graphql/schema.ts";
-import { useResponseCache } from "npm:@graphql-yoga/plugin-response-cache";
 
-Deno.cron("feeds update", "0 */2 * * *", async () => {
-  console.log(`update feeds starting`);
-  await updateDB();
-  console.log("update finished");
-});
+// Deno.cron("feeds update", "0 */2 * * *", async () => {
+//   console.log(`update feeds starting`);
+//   await updateDB();
+//   console.log("update finished");
+// });
 
 const app = new Hono();
 
@@ -22,22 +27,36 @@ const app = new Hono();
  * make response json pretty
  * GET /?pretty
  */
-app.use("/v1/*", prettyJSON());
-
-app.use("*", logger(logs));
+// app.use("/v1/*", prettyJSON());
 
 /**
  * Token
  */
-app.use("/v1/*", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
-app.use("/graphql", bearerAuth({ token: Deno.env.get("APP_KEY") as string }));
 app.use(
   "/v1/*",
+  bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
   compress({
     encoding: "gzip",
-  })
+  }),
+  etag(),
+  prettyJSON()
 );
+// app.use(
+//   "/v1/*",
+//   compress({
+//     encoding: "gzip",
+//   })
+// );
 
+/**
+ * Logs
+ */
+app.use("*", logger(logs));
+
+/**
+ * is static file needed?
+ */
+app.use("/favicon.ico", serveStatic({ path: "./favicon.ico" }));
 /**
  * Response for not found
  */
@@ -56,40 +75,13 @@ app.onError((err, c) => {
   return c.json({ message: err.message }, STATUS_CODE.InternalServerError);
 });
 
-const yoga = createYoga({
-  schema,
-  graphiql: Deno.env.get("ENV") === "development",
-  batching: {
-    limit: 2,
-  },
-  plugins: [
-    useResponseCache({
-      session: (request) => request.headers.get("authorization"),
-
-      ttl: 5_000,
-      ttlPerSchemaCoordinate: {
-        "Query.episode": 30_000,
-        "Query.podcast": 20_000,
-        "Query.podcasts": 10_000,
-        "Query.podcastByCategory": 20_000,
-        "Query.live": 30_000,
-      },
-    }),
-  ],
-});
-
-app.on(["POST", "GET", "OPTIONS"], "/graphql", async (c) => {
-  const response = await yoga.handleRequest(c.req.raw, c);
-
-  return new Response(response.body, response);
-});
-
 app.get("/", (c) => {
   return c.text("Podcastlife API");
 });
 
 app.route("/v1/podcasts", podcast);
 app.route("/v1/categories", category);
+app.route("/v1/episodes", episodes);
 
 console.log("Podcastlife API");
 Deno.serve(app.fetch);

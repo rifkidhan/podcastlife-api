@@ -5,13 +5,9 @@ import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { Hono, HTTPException } from "hono";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { logs } from "#/middlerwares/log.ts";
-import { PodcastLiveStream } from "#/types.ts";
-import { getLiveItem, PodcastLiveItem } from "#/helpers/live.ts";
 import { cache } from "#/middlerwares/cache.ts";
 import { getXataClient } from "#/db/xata.ts";
 import { transaction } from "#/db/xataTransaction.ts";
-
-const now = Math.floor(Date.now() / 1000) - 86400;
 
 const xata = getXataClient();
 
@@ -40,23 +36,9 @@ podcast.get(
 );
 
 podcast.get(
-  "/live",
-  cache({
-    cacheControl: "public, max-age=1800, stale-while-revalidate=1800",
-  })
-);
-
-podcast.get(
   "/recent",
   cache({
     cacheControl: "public, max-age=7200, stale-while-revalidate=1800",
-  })
-);
-
-podcast.get(
-  "/episode",
-  cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
   })
 );
 
@@ -74,25 +56,22 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
 
   const items = await feedParser(data.url);
 
-  try {
-    logs("get full podcast data from : ", id);
-    return c.json(
-      {
-        data: {
-          feed: {
-            ...data,
-            value: items?.value,
-            copyright: items?.copyright,
-          },
-          episodes: items?.items,
-          lives: items?.podcastLiveItems,
+  logs("get full podcast data from : ", id);
+
+  return c.json(
+    {
+      data: {
+        feed: {
+          ...data,
+          value: items?.value,
+          copyright: items?.copyright,
         },
+        episodes: items?.items,
+        lives: items?.podcastLiveItems,
       },
-      STATUS_CODE.OK
-    );
-  } catch (error) {
-    throw error;
-  }
+    },
+    STATUS_CODE.OK
+  );
 });
 
 /**
@@ -109,36 +88,46 @@ podcast.get("/podcast/url", async (c) => {
 
   const items = await feedParser(url);
 
-  try {
-    logs("get episodes url data from : ", url);
-    return c.json(
-      {
-        data: items,
-      },
-      STATUS_CODE.OK
-    );
-  } catch (error) {
-    throw error;
-  }
+  logs("get episodes url data from : ", url);
+
+  return c.json(
+    {
+      data: items,
+    },
+    STATUS_CODE.OK
+  );
 });
 
 /**
  * Get trending podcast from podcastindex
  */
 podcast.get("/trending", async (c) => {
-  const { max, cat } = c.req.query();
-
-  let maxResponse = 10;
+  const { max, cat, from } = c.req.query();
 
   const category = groupingCategories(cat);
 
-  if (max) {
-    maxResponse = Number(max);
-  }
+  const since = () => {
+    switch (from) {
+      case "current":
+        return Math.floor(Date.now() / 1000) - 1800;
+      case "day":
+        return Math.floor(Date.now() / 1000) - 86400;
+      case "week":
+        return Math.floor(Date.now() / 1000) - 604800;
+      case "month":
+        return Math.floor(Date.now() / 1000) - 2592000;
+      default:
+        return Math.floor(Date.now() / 1000) - 86400;
+    }
+  };
 
-  let url = `/podcasts/trending?max=${maxResponse}&since=${now}&lang=${language}&pretty`;
+  let query = {
+    max: max ? Number(max) : 10,
+    lang: language(),
+    since: since(),
+  };
 
-  if (category) {
+  if (category.length > 0) {
     const categories = category
       .map((tags) => {
         const firstWord = tags.charAt(0).toUpperCase();
@@ -147,49 +136,46 @@ podcast.get("/trending", async (c) => {
         return firstWord + rest;
       })
       .toString();
-    url = `/podcasts/trending?max=${maxResponse}&since=${now}&lang=${language}&cat=${categories}&pretty`;
+    query = Object.assign(query, { cat: categories });
   }
 
-  try {
-    const trending = await podcastApi(url);
-    if (trending.ok) {
-      const data = await trending.json();
-      const reqBody = JSON.stringify({
-        operations: data.feeds.map((item: any) => {
-          return {
-            get: {
-              table: "podcasts",
-              id: String(item.id),
-              columns: [
-                "id",
-                "title",
-                "explicit",
-                "author",
-                "owner",
-                "newestItemPubdate",
-                "image",
-                "description",
-                "tags",
-              ],
-            },
-          };
-        }),
-      });
-
-      const fromDB = await transaction(reqBody).then((res) =>
-        res
-          .filter((item: any) => typeof item.columns.id === "string")
-          .map((item: any) => {
-            return item.columns;
-          })
-      );
-
-      return c.json({ data: fromDB }, STATUS_CODE.OK);
-    }
+  const trending = await podcastApi(`/podcasts/trending?${query}`);
+  if (!trending.ok) {
     errorPodcastApi(trending.status);
-  } catch (error) {
-    throw error;
   }
+
+  const data = await trending.json();
+  const reqBody = JSON.stringify({
+    operations: data.feeds.map((item: any) => {
+      return {
+        get: {
+          table: "podcasts",
+          id: String(item.id),
+          columns: [
+            "id",
+            "title",
+            "explicit",
+            "author",
+            "owner",
+            "newestItemPubdate",
+            "image",
+            "description",
+            "tags",
+          ],
+        },
+      };
+    }),
+  });
+
+  const fromDB = await transaction(reqBody).then((res) =>
+    res
+      .filter((item: any) => typeof item.columns.id === "string")
+      .map((item: any) => {
+        return item.columns;
+      })
+  );
+
+  return c.json({ data: fromDB }, STATUS_CODE.OK);
 });
 
 /**
@@ -221,6 +207,7 @@ podcast.get("/tags/:tag", async (c) => {
     })
     .sort("newestItemPubdate", "desc")
     .getPaginated({
+      consistency: "eventual",
       pagination: {
         size: reqPage,
         before,
@@ -232,133 +219,78 @@ podcast.get("/tags/:tag", async (c) => {
     return c.notFound();
   }
 
-  try {
-    return c.json(
-      {
-        data: data.records.toSerializable(),
-        meta: data.meta,
-      },
-      STATUS_CODE.OK
-    );
-  } catch (error) {
-    throw error;
-  }
-});
-
-/**
- * Get live podcast
- */
-podcast.get("/live", async (c) => {
-  /**
-   * get live items from podcastindex only en & in
-   */
-  const result = await podcastApi(`/episodes/live?max=100&pretty`);
-
-  if (!result.ok) {
-    throw new HTTPException(result.status);
-  }
-
-  const items = await result.json().then((res) => res.items);
-
-  const fromIndex: string[] = [];
-  const idx = new Set();
-
-  const liveFromPodcastIndex = items.filter((obj: PodcastLiveStream) => {
-    const isDuplicate = idx.has(obj.feedId);
-
-    idx.add(obj.feedId);
-
-    if (!isDuplicate) {
-      return true;
-    }
-
-    return false;
-  });
-
-  for (const index of liveFromPodcastIndex) {
-    if (index.feedLanguage.includes("en" || "in") && index.categories) {
-      fromIndex.push(String(index.feedId));
-    }
-  }
-
-  let live: PodcastLiveItem[] = [];
-
-  await Promise.all(
-    fromIndex.map((item) =>
-      getLiveItem(item).then((res) => {
-        if (res) {
-          live = live.concat(res);
-        }
-      })
-    )
+  return c.json(
+    {
+      data: data.records.toSerializable(),
+      meta: data.meta,
+    },
+    STATUS_CODE.OK
   );
-
-  return c.json({ data: live }, STATUS_CODE.OK);
 });
 
 /**
  * get recent update podcast
  */
 podcast.get("/recent", async (c) => {
-  const data = await xata.db.podcasts
-    .select([
-      "id",
-      "title",
-      "newestItemPubdate",
-      "description",
-      "image",
-      "explicit",
-      "owner",
-      "author",
-    ])
-    .sort("newestItemPubdate", "desc")
-    .getMany();
+  const { cat } = c.req.query();
 
-  return c.json(
-    {
-      data: data.toSerializable(),
-    },
-    STATUS_CODE.OK
-  );
-});
+  let data: any[] = [];
 
-podcast.get("/episode", async (c) => {
-  const { guid, feedId } = c.req.query();
+  if (cat) {
+    const group = await xata.db.categories
+      .filter({
+        title: cat,
+      })
+      .getFirst();
 
-  if (!guid || !feedId) {
-    throw new HTTPException(STATUS_CODE.BadRequest, {
-      message: STATUS_TEXT[STATUS_CODE.BadRequest],
-    });
+    if (!group) {
+      return c.notFound();
+    }
+
+    const recentdata = await xata.db.category_podcast
+      .select([
+        "podcast.id",
+        "podcast.title",
+        "podcast.author",
+        "podcast.owner",
+        "podcast.explicit",
+        "podcast.newestItemPubdate",
+        "podcast.description",
+        "podcast.image",
+        "podcast.tags",
+      ])
+      .filter({
+        "category.id": group.id,
+      })
+      .getPaginated({
+        consistency: "eventual",
+      });
+    console.log(recentdata.meta);
+
+    data = recentdata.records.map((item) => item.podcast);
+  } else {
+    const recentData = await xata.db.podcasts
+      .select([
+        "id",
+        "title",
+        "newestItemPubdate",
+        "description",
+        "image",
+        "explicit",
+        "owner",
+        "author",
+      ])
+      .sort("newestItemPubdate", "desc")
+      .getPaginated({
+        consistency: "eventual",
+      });
+
+    data = recentData.records.toSerializable();
   }
-  const [podcast, data] = await Promise.all([
-    xata.db.podcasts.read(feedId),
-    podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
-      (res) => res.json()
-    ),
-  ]);
-
-  const episode = data.episode;
 
   return c.json(
     {
-      data: {
-        ...episode,
-        pubDate: episode.datePublished,
-        author: podcast?.author,
-        enclosure: {
-          url: episode.enclosureUrl,
-          length: episode.enclosureLength,
-          type: episode.enclosureType,
-        },
-        image: episode.image ?? episode.feedImage,
-        chapters: episode.chaptersUrl,
-        value: {
-          type: episode.value?.model.type,
-          method: episode.value?.model.method,
-          suggested: episode.value?.model.suggested,
-          recipients: episode.value?.destinations,
-        },
-      },
+      data: data,
     },
     STATUS_CODE.OK
   );
