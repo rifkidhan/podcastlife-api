@@ -15,22 +15,16 @@ import { STATUS_CODE } from "http-status";
 import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 
-// Deno.cron("feeds update", "0 */2 * * *", async () => {
-//   console.log(`update feeds starting`);
-//   await updateDB();
-//   console.log("update finished");
-// });
+Deno.cron("feeds update", "0 */2 * * *", async () => {
+  console.log(`update feeds starting`);
+  await updateDB();
+  console.log("update finished");
+});
 
 const app = new Hono();
 
 /**
- * make response json pretty
- * GET /?pretty
- */
-// app.use("/v1/*", prettyJSON());
-
-/**
- * Token
+ * middleware
  */
 app.use(
   "/v1/*",
@@ -41,12 +35,6 @@ app.use(
   etag(),
   prettyJSON()
 );
-// app.use(
-//   "/v1/*",
-//   compress({
-//     encoding: "gzip",
-//   })
-// );
 
 /**
  * Logs
