@@ -2,7 +2,6 @@ import { podcastApi } from "#/models/podcastapi.ts";
 import { integer, groupingCategories, language } from "#/helpers/matching.ts";
 import { getXataClient, DatabaseSchema, Podcasts } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
-import { transaction } from "#/db/xataTransaction.ts";
 
 interface FeedUpdate {
   id: string;
@@ -19,9 +18,11 @@ const xata = getXataClient();
 
 export const updateDB = async () => {
   const times = Math.floor(Date.now() / 1000) - 7200;
-  const newfeed = await podcastApi(
-    `/recent/feeds?max=1000&since=${times}&lang=${language()}`
-  ).then((res) => res.json());
+  const newfeed = await podcastApi(`/recent/feeds`, {
+    max: "1000",
+    since: String(times),
+    lang: language(),
+  }).then((res) => res.json());
 
   const data = newfeed.feeds.map((item: FeedUpdate) => {
     return {
@@ -48,21 +49,19 @@ export const updateDB = async () => {
 
 const checkDataExist = async (feeds: FeedUpdate[]) => {
   try {
-    const reqBody = JSON.stringify({
-      operations: feeds.map((item) => {
-        return {
-          get: {
-            table: "podcasts",
-            id: item.id,
-            columns: ["id"],
-          },
-        };
-      }),
-    });
+    const getPodcasts = feeds.map((item) => {
+      return {
+        get: {
+          table: "podcasts",
+          id: item.id,
+          columns: ["id"],
+        },
+      };
+    }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
 
-    const data = await transaction(reqBody);
+    const data = await xata.transactions.run(getPodcasts);
 
-    const result = data
+    const result = data.results
       .filter((item: any) => typeof item.columns.id === "string")
       .map((item: any) => {
         return item.columns.id as string;
@@ -105,7 +104,7 @@ const updateFeeds = async (feeds: FeedUpdate[]) => {
         },
       },
     };
-  }) as TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
+  }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
 
   try {
     await xata.transactions.run(trxUpdate);
@@ -119,9 +118,9 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
   const podcasts: Podcasts[] = [];
 
   for await (const feed of feeds) {
-    const getData = await podcastApi(`/podcasts/byfeedid?id=${feed.id}`).then(
-      (res) => res.json()
-    );
+    const getData = await podcastApi(`/podcasts/byfeedid`, {
+      id: feed.id,
+    }).then((res) => res.json());
     const data = getData.feed;
 
     if (data.categories) {

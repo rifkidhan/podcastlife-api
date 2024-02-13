@@ -6,8 +6,8 @@ import { Hono, HTTPException } from "hono";
 import { STATUS_CODE, STATUS_TEXT } from "http-status";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "#/middlerwares/cache.ts";
-import { getXataClient } from "#/db/xata.ts";
-import { transaction } from "#/db/xataTransaction.ts";
+import { getXataClient, DatabaseSchema } from "#/db/xata.ts";
+import { TransactionOperation } from "npm:@xata.io/client@latest";
 
 const xata = getXataClient();
 
@@ -81,8 +81,8 @@ podcast.get("/podcast/url", async (c) => {
   const { url } = c.req.query();
 
   if (!url) {
-    throw new HTTPException(STATUS_CODE.BadRequest, {
-      message: STATUS_TEXT[STATUS_CODE.BadRequest],
+    throw new HTTPException(STATUS_CODE["BadRequest"], {
+      message: STATUS_TEXT[STATUS_CODE["BadRequest"]],
     });
   }
 
@@ -128,50 +128,39 @@ podcast.get("/trending", async (c) => {
   };
 
   if (category.length > 0) {
-    const categories = category
-      .map((tags) => {
-        const firstWord = tags.charAt(0).toUpperCase();
-        const rest = tags.slice(1);
-
-        return firstWord + rest;
-      })
-      .toString();
-    query = Object.assign(query, { cat: categories });
+    query = Object.assign(query, { cat: category.toString() });
   }
 
-  const searchParams = new URLSearchParams(query);
+  const trending = await podcastApi(`/podcasts/trending?`, query);
 
-  const trending = await podcastApi(`/podcasts/trending?${searchParams}`);
   if (!trending.ok) {
     errorPodcastApi(trending.status);
   }
 
   const data = await trending.json();
 
-  const reqBody = JSON.stringify({
-    operations: data.feeds.map((item: any) => {
-      return {
-        get: {
-          table: "podcasts",
-          id: String(item.id),
-          columns: [
-            "id",
-            "title",
-            "explicit",
-            "author",
-            "owner",
-            "newestItemPubdate",
-            "image",
-            "description",
-            "tags",
-          ],
-        },
-      };
-    }),
-  });
+  const getPodcasts = data.feeds.map((item: any) => {
+    return {
+      get: {
+        table: "podcasts",
+        id: String(item.id),
+        columns: [
+          "id",
+          "title",
+          "explicit",
+          "author",
+          "owner",
+          "newestItemPubdate",
+          "image",
+          "description",
+          "tags",
+        ],
+      },
+    };
+  }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
 
-  const fromDB = await transaction(reqBody).then((res) =>
-    res
+  const fromDB = await xata.transactions.run(getPodcasts).then((res) =>
+    res.results
       .filter((item: any) => typeof item.columns.id === "string")
       .map((item: any) => {
         return item.columns;
@@ -268,7 +257,6 @@ podcast.get("/recent", async (c) => {
       .getPaginated({
         consistency: "eventual",
       });
-    console.log(recentdata.meta);
 
     data = recentdata.records.map((item) => item.podcast);
   } else {
@@ -303,8 +291,8 @@ podcast.get("/recent", async (c) => {
  * Decline method
  */
 podcast.on(["PUT", "DELETE", "OPTIONS", "PATCH", "POST"], "/*", () => {
-  throw new HTTPException(STATUS_CODE.MethodNotAllowed, {
-    message: STATUS_TEXT[STATUS_CODE.MethodNotAllowed],
+  throw new HTTPException(STATUS_CODE["MethodNotAllowed"], {
+    message: STATUS_TEXT[STATUS_CODE["MethodNotAllowed"]],
   });
 });
 

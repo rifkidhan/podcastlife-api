@@ -6,8 +6,8 @@ import { PodcastLiveStream } from "#/types.ts";
 import { getLiveItem, PodcastLiveItem } from "#/helpers/live.ts";
 import type { GetLiveParams } from "#/helpers/live.ts";
 import { cache } from "#/middlerwares/cache.ts";
-import { getXataClient } from "#/db/xata.ts";
-import { transaction } from "#/db/xataTransaction.ts";
+import { getXataClient, DatabaseSchema } from "#/db/xata.ts";
+import { TransactionOperation } from "npm:@xata.io/client@latest";
 
 const xata = getXataClient();
 
@@ -41,11 +41,16 @@ episodes.get("/single", async (c) => {
       message: STATUS_TEXT[STATUS_CODE.BadRequest],
     });
   }
+
+  const query = {
+    guid,
+    feedid: feedId,
+    fulltext: "true",
+  };
+
   const [podcast, data] = await Promise.all([
     xata.db.podcasts.read(feedId),
-    podcastApi(`/episodes/byguid?guid=${guid}&feedid=${feedId}&fulltext`).then(
-      (res) => res.json()
-    ),
+    podcastApi("/episodes/byguid", query).then((res) => res.json()),
   ]);
 
   const episode = data.episode;
@@ -84,10 +89,10 @@ episodes.get("/live", async (c) => {
   /**
    * get live items from podcastindex only en & in
    */
-  const result = await podcastApi(`/episodes/live?max=100&pretty`);
+  const result = await podcastApi(`/episodes/live`, { max: "100" });
 
   if (!result.ok) {
-    throw new HTTPException(result.status);
+    throw new HTTPException(STATUS_CODE["BadRequest"]);
   }
 
   const items = (await result
@@ -110,21 +115,19 @@ episodes.get("/live", async (c) => {
     }
   });
 
-  const getFeedsFromDb = await transaction(
-    JSON.stringify({
-      operations: liveFromPodcastIndex.map((item) => {
-        return {
-          get: {
-            table: "podcasts",
-            id: String(item.feedId),
-            columns: ["id", "author", "url"],
-          },
-        };
-      }),
-    })
-  );
+  const getPodcasts = liveFromPodcastIndex.map((item) => {
+    return {
+      get: {
+        table: "podcasts",
+        id: String(item.feedId),
+        columns: ["id", "author", "url"],
+      },
+    };
+  }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
 
-  const feeds = getFeedsFromDb
+  const getFeedsFromDb = await xata.transactions.run(getPodcasts);
+
+  const feeds = getFeedsFromDb.results
     .filter((item: any) => typeof item.columns.id === "string")
     .map((item: any) => {
       return item.columns;
