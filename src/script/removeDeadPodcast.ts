@@ -26,6 +26,16 @@ const removeDeadPodcast = async () => {
   let batch = 1;
   let deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
 
+  // console.log("remove dead podcast batch:", batch);
+  // await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
+
+  // while (deleteRecords.length > 0) {
+  //   batch++;
+  //   deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
+  //   console.log("remove dead podcast batch:", batch);
+  //   await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
+  // }
+
   while (deleteRecords.length > 0) {
     console.log("remove dead podcast batch:", batch);
     await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));

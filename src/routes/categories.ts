@@ -1,6 +1,7 @@
-import { Hono, HTTPException } from "hono";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { integer } from "#/helpers/matching.ts";
-import { STATUS_CODE, STATUS_TEXT } from "http-status";
+import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "#/middlerwares/cache.ts";
 import { getXataClient } from "#/db/xata.ts";
@@ -13,7 +14,7 @@ category.get(
   "/*",
   cache({
     cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
-  })
+  }),
 );
 
 /**
@@ -70,7 +71,7 @@ category.get("/:categoryName", async (c) => {
       data: categories.records.map((item) => item.podcast),
       meta: categories.meta,
     },
-    STATUS_CODE.OK
+    STATUS_CODE.OK,
   );
 });
 

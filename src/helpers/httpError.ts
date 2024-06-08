@@ -1,5 +1,5 @@
-import { ErrorStatus, STATUS_CODE } from "http-status";
-import { HTTPException } from "hono";
+import { ErrorStatus, STATUS_CODE } from "@std/http/status";
+import { HTTPException } from "hono/http-exception";
 
 export const errorPodcastApi = (status: ErrorStatus | number) => {
   let message = "invalid parameter from PodcastIndex";

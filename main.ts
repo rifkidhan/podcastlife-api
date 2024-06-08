@@ -1,17 +1,16 @@
 import "env";
-import { Hono, HTTPException } from "hono";
-import {
-  bearerAuth,
-  logger,
-  prettyJSON,
-  compress,
-  etag,
-  serveStatic,
-} from "hono/middleware";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { bearerAuth } from "hono/bearer-auth";
+import { logger } from "hono/logger";
+import { prettyJSON } from "hono/pretty-json";
+import { compress } from "hono/compress";
+import { etag } from "hono/etag";
+import { serveStatic } from "hono/deno";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
 import episodes from "#/routes/episodes.ts";
-import { STATUS_CODE } from "http-status";
+import { STATUS_CODE } from "@std/http/status";
 import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 
@@ -33,7 +32,7 @@ app.use(
     encoding: "gzip",
   }),
   etag(),
-  prettyJSON()
+  prettyJSON(),
 );
 
 /**
