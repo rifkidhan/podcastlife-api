@@ -4,8 +4,7 @@
     "specifiers": {
       "jsr:@hono/hono": "jsr:@hono/hono@4.4.4",
       "jsr:@std/http@^0.224.4": "jsr:@std/http@0.224.4",
-      "npm:@xata.io/client@latest": "npm:@xata.io/client@0.29.1_typescript@5.3.3",
-      "npm:convert-csv-to-json": "npm:convert-csv-to-json@2.0.0"
+      "npm:@xata.io/client@latest": "npm:@xata.io/client@0.29.5_typescript@5.4.5"
     },
     "jsr": {
       "@hono/hono@4.4.4": {
@@ -16,18 +15,14 @@
       }
     },
     "npm": {
-      "@xata.io/client@0.29.1_typescript@5.3.3": {
-        "integrity": "sha512-JuxRxk28tDFQUOgxcSB0VRWvK+t1c307tSgESZmwzu1Uj0NxvD+YH4vW2Ob5A4o/daK0wgaITO22vsdTidwakQ==",
+      "@xata.io/client@0.29.5_typescript@5.4.5": {
+        "integrity": "sha512-b55dmPVNVFOE5nj2F2G6t9l/d5yYBhIu5X5w3rznhhsriGHkrzn93tqJexIZPS77E7f/yDXcFz06KbvR3bHK5w==",
         "dependencies": {
-          "typescript": "typescript@5.3.3"
+          "typescript": "typescript@5.4.5"
         }
       },
-      "convert-csv-to-json@2.0.0": {
-        "integrity": "sha512-pMDclso1Afm8tGsJfcVqay10WSPgpoGKGoHdIXWIMXJX29qayEC/MlAsd6csYr59mUjLoJxpkHi37cTUSaNUpw==",
-        "dependencies": {}
-      },
-      "typescript@5.3.3": {
-        "integrity": "sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==",
+      "typescript@5.4.5": {
+        "integrity": "sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==",
         "dependencies": {}
       }
     }
@@ -52,7 +47,7 @@
     "https://deno.land/std@0.207.0/encoding/base64.ts": "81c0ecff5ccb402def58ca03d8bd245bd01da15a077d3362b568e991aa10f4d9",
     "https://deno.land/std@0.207.0/encoding/base64url.ts": "b15a4c8c988362536334a31dbb75a2429346f8c0f9e2662f961567c5dd2f58e1",
     "https://deno.land/std@0.207.0/encoding/hex.ts": "a384101d02cd87036c708f540825feb5b073c8527a00d635e48b2e69c992a5f9",
-    "https://esm.sh/podcast-partytime@4.7.0": "86df8bd6d6ce83208bafd940d7efa1c04df19bf8431b24e374ad44f42ac6e39c",
+    "https://esm.sh/podcast-partytime@4.7.0": "2ca7090e2bd87c6d966e17e68f0a1119328a02fc39ce3a08c4eaa5487b8afece",
     "https://esm.sh/v135/dotenv@10.0.0/denonext/dotenv.mjs": "3d8133851237ad380a1f9e8ee9b83904593301b9c751f29f51825ed799dc5a4f",
     "https://esm.sh/v135/fast-xml-parser@3.21.1/denonext/fast-xml-parser.mjs": "17df1c27ff89fea389a326c27a66542f2b2e6e640bfc32dfd561d132f50f63ac",
     "https://esm.sh/v135/he@1.2.0/denonext/he.mjs": "1ffb3a2e1892578e01267fda4b32f30dd0b4b3be7393fe239b0ea30cf1d654c7",

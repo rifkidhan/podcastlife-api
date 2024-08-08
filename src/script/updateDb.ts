@@ -1,6 +1,6 @@
 import { podcastApi } from "#/models/podcastapi.ts";
-import { integer, groupingCategories, language } from "#/helpers/matching.ts";
-import { getXataClient, DatabaseSchema, Podcasts } from "#/db/xata.ts";
+import { groupingCategories, integer, language } from "#/helpers/matching.ts";
+import { DatabaseSchema, getXataClient, Podcasts } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
 
 interface FeedUpdate {
@@ -179,7 +179,7 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
             podcast: item.id,
             category: categories[batch].id,
           };
-        })
+        }),
       );
     }
 

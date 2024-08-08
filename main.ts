@@ -4,7 +4,6 @@ import { HTTPException } from "hono/http-exception";
 import { bearerAuth } from "hono/bearer-auth";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { compress } from "hono/compress";
 import { etag } from "hono/etag";
 import { serveStatic } from "hono/deno";
 import category from "#/routes/categories.ts";
@@ -28,9 +27,6 @@ const app = new Hono();
 app.use(
   "/v1/*",
   bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
-  compress({
-    encoding: "gzip",
-  }),
   etag(),
   prettyJSON(),
 );

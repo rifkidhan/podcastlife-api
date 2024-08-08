@@ -26,16 +26,7 @@ const removeDeadPodcast = async () => {
   let batch = 1;
   let deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
 
-  // console.log("remove dead podcast batch:", batch);
-  // await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
-
-  // while (deleteRecords.length > 0) {
-  //   batch++;
-  //   deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
-  //   console.log("remove dead podcast batch:", batch);
-  //   await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
-  // }
-
+// TODO: error for automation
   while (deleteRecords.length > 0) {
     console.log("remove dead podcast batch:", batch);
     await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
@@ -58,7 +49,7 @@ const removeDeadPodcast = async () => {
 
   console.log("start with", orphanMap.records[0].id);
   await xata.db.category_podcast.delete(
-    orphanMap.records.map((item) => item.id)
+    orphanMap.records.map((item) => item.id),
   );
 
   while (orphanMap.hasNextPage()) {
@@ -66,7 +57,7 @@ const removeDeadPodcast = async () => {
     console.log("start with", orphanMap.records[0].id);
 
     await xata.db.category_podcast.delete(
-      orphanMap.records.map((item) => item.id)
+      orphanMap.records.map((item) => item.id),
     );
   }
 

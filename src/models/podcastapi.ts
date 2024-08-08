@@ -3,13 +3,13 @@ import { encodeHex } from "https://deno.land/std@0.207.0/encoding/hex.ts";
 
 const podcastUrl = Deno.env.get("PODCAST_URL") || "https://rifkidhan.my.id";
 const podcastKey = Deno.env.get("PODCAST_KEY") || "https://rifkidhan.my.id";
-const podcastSecret =
-  Deno.env.get("PODCAST_SECRET") || "https://rifkidhan.my.id";
+const podcastSecret = Deno.env.get("PODCAST_SECRET") ||
+  "https://rifkidhan.my.id";
 const userAgent = Deno.env.get("USER_AGENT") || "PodcastLife/1.0";
 
 export const podcastApi = async (
   endpoint: string,
-  query?: Record<string, string>
+  query?: Record<string, string>,
 ) => {
   const times = Math.floor(Date.now() / 1000);
 
@@ -17,7 +17,7 @@ export const podcastApi = async (
 
   const hash = await crypto.subtle.digest(
     "SHA-1",
-    new TextEncoder().encode(dataHash)
+    new TextEncoder().encode(dataHash),
   );
 
   const authHeader = encodeHex(hash);

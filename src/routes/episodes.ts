@@ -62,6 +62,7 @@ episodes.get("/single", async (c) => {
     {
       data: {
         ...episode,
+        explicit: episode.explicit === 0 ? false : true,
         pubDate: episode.datePublished,
         author: podcast?.author,
         enclosure: {
@@ -142,7 +143,7 @@ episodes.get("/live", async (c) => {
         if (res) {
           live = live.concat(res);
         }
-      })
+      }),
     ),
   );
 
