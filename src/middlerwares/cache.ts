@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-import cachest from "#/utils/cache-provider.ts";
+import { Cachest } from "#/utils/cache-provider.ts";
 
 export const cache = (options: {
   cacheControl?: string;
@@ -10,7 +10,7 @@ export const cache = (options: {
     }
   };
 
-  const provider = cachest();
+  const provider = new Cachest();
 
   return async (c, next) => {
     const key = c.req.url;

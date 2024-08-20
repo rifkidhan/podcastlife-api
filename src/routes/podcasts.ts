@@ -7,8 +7,8 @@ import { HTTPException } from "hono/http-exception";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "#/middlerwares/cache.ts";
-import { DatabaseSchema, getXataClient } from "#/db/xata.ts";
-import { TransactionOperation } from "npm:@xata.io/client@latest";
+import { CategoryPodcastRecord, DatabaseSchema, getXataClient, PodcastsRecord } from "#/db/xata.ts";
+import { Page, SelectedPick, TransactionOperation } from "npm:@xata.io/client@latest";
 
 const xata = getXataClient();
 
@@ -45,6 +45,7 @@ podcast.get(
 
 /**
  * Get Full info from database and parser
+ * Require Feed Id
  */
 podcast.get("/podcast/feed/:feedId", async (c) => {
   const id = c.req.param("feedId");
@@ -77,6 +78,7 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
 
 /**
  * Get Episodes from request url
+ * require url from podcast
  */
 podcast.get("/podcast/url", async (c) => {
   const { url } = c.req.query();
@@ -103,7 +105,7 @@ podcast.get("/podcast/url", async (c) => {
  * Get trending podcast from podcastindex
  */
 podcast.get("/trending", async (c) => {
-  const { max, cat, from } = c.req.query();
+  const { max, cat, from, lang } = c.req.query();
 
   const category = groupingCategories(cat);
 
@@ -124,7 +126,7 @@ podcast.get("/trending", async (c) => {
 
   let query = {
     max: max ? max : String(10),
-    lang: language(),
+    lang: lang ? language(lang) : language(),
     since: String(since()),
   };
 
@@ -176,7 +178,7 @@ podcast.get("/trending", async (c) => {
  */
 podcast.get("/tags/:tag", async (c) => {
   const { tag } = c.req.param();
-  const { perPage, before, after } = c.req.query();
+  const { perPage, before, after, lang } = c.req.query();
 
   let reqPage = 50;
 
@@ -184,38 +186,84 @@ podcast.get("/tags/:tag", async (c) => {
     reqPage = Number(perPage);
   }
 
-  const data = await xata.db.podcasts
-    .select([
-      "id",
-      "title",
-      "newestItemPubdate",
-      "description",
-      "image",
-      "explicit",
-      "owner",
-      "author",
-    ])
-    .filter({
-      tags: { $includes: tag },
-    })
-    .sort("newestItemPubdate", "desc")
-    .getPaginated({
-      consistency: "eventual",
-      pagination: {
-        size: reqPage,
-        before,
-        after,
-      },
-    });
+  let result: Page<
+    PodcastsRecord,
+    SelectedPick<
+      PodcastsRecord,
+      (
+        | "title"
+        | "description"
+        | "image"
+        | "explicit"
+        | "author"
+        | "owner"
+        | "newestItemPubdate"
+        | "id"
+      )[]
+    >
+  >;
 
-  if (data.records.length < 1) {
+  if (lang) {
+    const languages = language(lang).split(",");
+
+    result = await xata.db.podcasts
+      .select([
+        "id",
+        "title",
+        "newestItemPubdate",
+        "description",
+        "image",
+        "explicit",
+        "owner",
+        "author",
+      ])
+      .filter({
+        tags: { $includes: tag },
+        language: { $any: languages },
+      })
+      .sort("newestItemPubdate", "desc")
+      .getPaginated({
+        consistency: "eventual",
+        pagination: {
+          size: reqPage,
+          before,
+          after,
+        },
+      });
+  } else {
+    result = await xata.db.podcasts
+      .select([
+        "id",
+        "title",
+        "newestItemPubdate",
+        "description",
+        "image",
+        "explicit",
+        "owner",
+        "author",
+      ])
+      .filter({
+        tags: { $includes: tag },
+      })
+      .sort("newestItemPubdate", "desc")
+      .getPaginated({
+        consistency: "eventual",
+        pagination: {
+          size: reqPage,
+          before,
+          after,
+        },
+      });
+  }
+
+  if (result.records.length < 1) {
     return c.notFound();
   }
 
   return c.json(
     {
-      data: data.records.toSerializable(),
-      meta: data.meta,
+      data: result.records.toSerializable(),
+      meta: result.meta,
     },
     STATUS_CODE.OK,
   );
@@ -225,7 +273,7 @@ podcast.get("/tags/:tag", async (c) => {
  * get recent update podcast
  */
 podcast.get("/recent", async (c) => {
-  const { cat } = c.req.query();
+  const { cat, lang } = c.req.query();
 
   let data: any[] = [];
 
@@ -240,42 +288,127 @@ podcast.get("/recent", async (c) => {
       return c.notFound();
     }
 
-    const recentdata = await xata.db.category_podcast
-      .select([
-        "podcast.id",
-        "podcast.title",
-        "podcast.author",
-        "podcast.owner",
-        "podcast.explicit",
-        "podcast.newestItemPubdate",
-        "podcast.description",
-        "podcast.image",
-        "podcast.tags",
-      ])
-      .filter({
-        "category.id": group.id,
-      })
-      .getPaginated({
-        consistency: "eventual",
-      });
+    let recentData: Page<
+      CategoryPodcastRecord,
+      SelectedPick<
+        CategoryPodcastRecord,
+        (
+          | "podcast.id"
+          | "podcast.title"
+          | "podcast.author"
+          | "podcast.owner"
+          | "podcast.explicit"
+          | "podcast.newestItemPubdate"
+          | "podcast.description"
+          | "podcast.image"
+          | "podcast.tags"
+        )[]
+      >
+    >;
 
-    data = recentdata.records.map((item) => item.podcast);
+    if (lang) {
+      const languages = language(lang).split(",");
+      recentData = await xata.db.category_podcast
+        .select([
+          "podcast.id",
+          "podcast.title",
+          "podcast.author",
+          "podcast.owner",
+          "podcast.explicit",
+          "podcast.newestItemPubdate",
+          "podcast.description",
+          "podcast.image",
+          "podcast.tags",
+        ])
+        .filter({
+          "category.id": group.id,
+          "podcast.language": { $any: languages },
+        })
+        .sort("podcast.newestItemPubdate", "desc")
+        .getPaginated({
+          consistency: "eventual",
+        });
+    } else {
+      recentData = await xata.db.category_podcast
+        .select([
+          "podcast.id",
+          "podcast.title",
+          "podcast.author",
+          "podcast.owner",
+          "podcast.explicit",
+          "podcast.newestItemPubdate",
+          "podcast.description",
+          "podcast.image",
+          "podcast.tags",
+        ])
+        .filter({
+          "category.id": group.id,
+        })
+        .sort("podcast.newestItemPubdate", "desc")
+        .getPaginated({
+          consistency: "eventual",
+        });
+    }
+
+    data = recentData.records.map((item) => item.podcast);
   } else {
-    const recentData = await xata.db.podcasts
-      .select([
-        "id",
-        "title",
-        "newestItemPubdate",
-        "description",
-        "image",
-        "explicit",
-        "owner",
-        "author",
-      ])
-      .sort("newestItemPubdate", "desc")
-      .getPaginated({
-        consistency: "eventual",
-      });
+    let recentData: Page<
+      PodcastsRecord,
+      SelectedPick<
+        PodcastsRecord,
+        (
+          | "id"
+          | "title"
+          | "description"
+          | "image"
+          | "explicit"
+          | "author"
+          | "owner"
+          | "newestItemPubdate"
+          | "tags"
+        )[]
+      >
+    >;
+    if (lang) {
+      const languages = language(lang).split(",");
+
+      recentData = await xata.db.podcasts
+        .select([
+          "id",
+          "title",
+          "newestItemPubdate",
+          "description",
+          "image",
+          "explicit",
+          "owner",
+          "author",
+          "tags",
+        ])
+        .filter({
+          language: { $any: languages },
+        })
+        .sort("newestItemPubdate", "desc")
+        .getPaginated({
+          consistency: "eventual",
+        });
+    } else {
+      recentData = await xata.db.podcasts
+        .select([
+          "id",
+          "title",
+          "newestItemPubdate",
+          "description",
+          "image",
+          "explicit",
+          "owner",
+          "author",
+          "tags",
+        ])
+        .sort("newestItemPubdate", "desc")
+        .getPaginated({
+          consistency: "eventual",
+        });
+    }
 
     data = recentData.records.toSerializable();
   }

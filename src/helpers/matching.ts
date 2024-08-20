@@ -8,7 +8,7 @@ export const language = (search?: string) => {
   switch (search) {
     case "en":
       return "en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
-    case "in":
+    case "id":
       return "in";
     default:
       return "in,en,en-au,en-bz,en-ca,en-ie,en-jm,en-nz,en-ph,en-za,en-tt,en-gb,en-us,en-zw";
@@ -66,7 +66,14 @@ export const groupingCategories = (arg: string) => {
         "sexuality",
       ];
     case "kids-family":
-      return ["kids", "family", "parenting", "pets", "animals", "stories"];
+      return [
+        "kids",
+        "family",
+        "parenting",
+        "pets",
+        "animals",
+        "stories",
+      ];
     case "leisure":
       return [
         "leisure",

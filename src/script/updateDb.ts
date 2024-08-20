@@ -57,7 +57,10 @@ const checkDataExist = async (feeds: FeedUpdate[]) => {
           columns: ["id"],
         },
       };
-    }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
+    }) satisfies TransactionOperation<
+      DatabaseSchema,
+      keyof DatabaseSchema
+    >[];
 
     const data = await xata.transactions.run(getPodcasts);
 
@@ -161,7 +164,8 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
 
   console.log("mapping feeds category");
 
-  const categories = await xata.db.categories.select(["id", "title"]).getAll();
+  const categories = await xata.db.categories.select(["id", "title"])
+    .getAll();
 
   let batch = 0;
 

@@ -143,7 +143,7 @@ episodes.get("/live", async (c) => {
         if (res) {
           live = live.concat(res);
         }
-      }),
+      })
     ),
   );
 

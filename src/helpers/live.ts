@@ -1,4 +1,4 @@
-import { FeedObject } from "https://esm.sh/podcast-partytime@4.7.0";
+import { FeedObject } from "https://esm.sh/podcast-partytime@4.8.0";
 import { feedParser } from "#/models/parsefeed.ts";
 
 type Unpack<T> = T extends (infer U)[] ? U : T;

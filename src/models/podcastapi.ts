@@ -1,5 +1,5 @@
-import { crypto } from "https://deno.land/std@0.207.0/crypto/mod.ts";
-import { encodeHex } from "https://deno.land/std@0.207.0/encoding/hex.ts";
+import { crypto } from "@std/crypto/crypto";
+import { encodeHex } from "@std/encoding/hex";
 
 const podcastUrl = Deno.env.get("PODCAST_URL") || "https://rifkidhan.my.id";
 const podcastKey = Deno.env.get("PODCAST_KEY") || "https://rifkidhan.my.id";

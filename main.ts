@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { bearerAuth } from "hono/bearer-auth";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { etag } from "hono/etag";
+import { etag, RETAINED_304_HEADERS } from "hono/etag";
 import { serveStatic } from "hono/deno";
 import category from "#/routes/categories.ts";
 import podcast from "#/routes/podcasts.ts";
@@ -27,7 +27,9 @@ const app = new Hono();
 app.use(
   "/v1/*",
   bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
-  etag(),
+  etag({
+    retainedHeaders: ["x-message-retain", ...RETAINED_304_HEADERS],
+  }),
   prettyJSON(),
 );
 
@@ -40,6 +42,7 @@ app.use("*", logger(logs));
  * is static file needed?
  */
 app.use("/favicon.ico", serveStatic({ path: "./favicon.ico" }));
+
 /**
  * Response for not found
  */

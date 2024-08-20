@@ -26,10 +26,12 @@ const removeDeadPodcast = async () => {
   let batch = 1;
   let deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
 
-// TODO: error for automation
+  // TODO: error for automation
   while (deleteRecords.length > 0) {
     console.log("remove dead podcast batch:", batch);
-    await xata.db.podcasts.delete(deleteRecords.map((item: any) => item["3"]));
+    await xata.db.podcasts.delete(
+      deleteRecords.map((item: any) => item["3"]),
+    );
     batch++;
     deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
   }

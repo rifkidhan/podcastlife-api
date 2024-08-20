@@ -2,7 +2,6 @@
 package.json
 pnpm-lock.yaml
 node_modules
-.vscode
-podcastindex_feeds.db
 .xata
 .helix
+.zed
