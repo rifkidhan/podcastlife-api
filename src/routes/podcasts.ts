@@ -18,14 +18,14 @@ const podcast = new Hono();
 podcast.get(
   "/podcast/*",
   cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
+    cacheControl: "public, max-age=7200, stale-while-revalidate=3600",
   }),
 );
 
 podcast.get(
   "/trending",
   cache({
-    cacheControl: "public, max-age=1800, stale-while-revalidate=3600",
+    cacheControl: "public, max-age=1800, stale-while-revalidate=1800",
   }),
 );
 

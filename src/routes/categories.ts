@@ -14,7 +14,7 @@ const xata = getXataClient();
 category.get(
   "/*",
   cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
+    cacheControl: "public, max-age=7200, stale-while-revalidate=1800",
   }),
 );
 
@@ -73,7 +73,7 @@ category.get("/:categoryName", async (c) => {
       ])
       .filter({
         "category.id": group.id,
-        "podcast.language": {$any: languages}
+        "podcast.language": { $any: languages },
       })
       .sort("podcast.newestItemPubdate", "desc")
       .getPaginated({

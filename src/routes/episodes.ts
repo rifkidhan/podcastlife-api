@@ -20,7 +20,7 @@ const episodes = new Hono();
 episodes.get(
   "/single",
   cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
+    cacheControl: "public, max-age=86400, stale-while-revalidate=1800",
   }),
 );
 
