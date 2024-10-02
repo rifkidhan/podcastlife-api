@@ -82,7 +82,12 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
 
   const { items, podcastLiveItems, ...feed } = result;
 
-  const description = await sanitizeHTML(data.description, []);
+  const [description, subtitle, summary] = await Promise.all([
+    sanitizeHTML(data.description, []),
+    sanitizeHTML(feed.subtitle, []),
+    sanitizeHTML(feed.summary, [])
+  ])
+
   const episodeItems: FeedObject["items"] = [];
 
   const liveItems: FeedObject["podcastLiveItems"] = [];
@@ -108,11 +113,12 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
     {
       data: {
         feed: {
-          ...feed,
+          ...data,
           description,
+          summary,
+          subtitle,
           value: feed.value,
           copyright: feed.copyright,
-          blurhash: data.blurhash,
         },
         episodes: episodeItems,
         lives: liveItems,
