@@ -6,7 +6,8 @@ import { logs } from "#/middlerwares/log.ts";
 import { PodcastLiveStream } from "#/types.ts";
 import { getLiveItem, PodcastLiveItem } from "#/helpers/live.ts";
 import type { GetLiveParams } from "#/helpers/live.ts";
-import { cache } from "#/middlerwares/cache.ts";
+import { sanitizeHTML } from "#/utils/sanitize.ts";
+import { cache } from "hono/cache";
 import { DatabaseSchema, getXataClient } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
 
@@ -20,14 +21,18 @@ const episodes = new Hono();
 episodes.get(
   "/single",
   cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=1800",
+    cacheName: "podcastlife-episode",
+    cacheControl: "max-age=86400",
+    wait: true,
   }),
 );
 
 episodes.get(
   "/live",
   cache({
-    cacheControl: "public, max-age=1800, stale-while-revalidate=1800",
+    cacheName: "podcastlife-episode",
+    cacheControl: "max-age=360",
+    wait: true,
   }),
 );
 
@@ -55,6 +60,7 @@ episodes.get("/single", async (c) => {
   ]);
 
   const episode = data.episode;
+  const description = await sanitizeHTML(episode.description);
 
   logs("get espidode from ", feedId, "guid ", guid);
 
@@ -62,6 +68,7 @@ episodes.get("/single", async (c) => {
     {
       data: {
         ...episode,
+        description,
         explicit: episode.explicit === 0 ? false : true,
         pubDate: episode.datePublished,
         author: podcast?.author,
@@ -143,7 +150,7 @@ episodes.get("/live", async (c) => {
         if (res) {
           live = live.concat(res);
         }
-      })
+      }),
     ),
   );
 

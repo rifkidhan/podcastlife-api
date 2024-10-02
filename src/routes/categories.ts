@@ -1,11 +1,12 @@
 import { Hono } from "hono";
+import { cache } from "#/middlerwares/cache.ts";
 import { HTTPException } from "hono/http-exception";
 import { integer, language } from "#/helpers/matching.ts";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
 import { logs } from "#/middlerwares/log.ts";
-import { cache } from "#/middlerwares/cache.ts";
 import { CategoryPodcastRecord, getXataClient } from "#/db/xata.ts";
 import { Page, SelectedPick } from "npm:@xata.io/client@latest";
+import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 const category = new Hono();
 
@@ -14,9 +15,20 @@ const xata = getXataClient();
 category.get(
   "/*",
   cache({
-    cacheControl: "public, max-age=7200, stale-while-revalidate=1800",
+    cacheControl: "max-age=7200",
   }),
 );
+
+type Data = {
+  id?: string;
+  title?: string;
+  explicit: boolean;
+  newestItemPubdate: number;
+  author?: string | null;
+  owner?: string | null;
+  description?: string | null;
+  image?: string | null;
+};
 
 /**
  * Get All Podcast from Category
@@ -112,9 +124,26 @@ category.get("/:categoryName", async (c) => {
 
   logs(cat);
 
+  const result: Data[] = [];
+
+  for (const item of categories.records) {
+    const description = await sanitizeHTML(item.podcast?.description, []);
+
+    result.push({
+      id: item.podcast?.id,
+      title: item.podcast?.title,
+      author: item.podcast?.author,
+      owner: item.podcast?.owner,
+      explicit: item.podcast?.explicit ?? false,
+      newestItemPubdate: item.podcast?.newestItemPubdate ?? 0,
+      description,
+      image: item.podcast?.image,
+    });
+  }
+
   return c.json(
     {
-      data: categories.records.map((item) => item.podcast),
+      data: result,
       meta: categories.meta,
     },
     STATUS_CODE.OK,

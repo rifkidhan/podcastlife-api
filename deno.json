@@ -1,9 +1,9 @@
 {
 	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"tasks": {
-		"dev": "deno run --allow-read --allow-env --allow-net --watch main.ts",
-		"start": "deno run --allow-read --allow-env --allow-net main.ts",
-		"rmpodcast": "deno run --allow-read --allow-env --allow-net src/script/removeDeadPodcast.ts"
+		"dev": "deno run -REN --watch main.ts",
+		"start": "deno run -REN main.ts",
+		"rmpodcast": "deno run -REN src/script/removeDeadPodcast.ts"
 	},
 	"imports": {
 		"#/": "./src/",
@@ -11,7 +11,8 @@
 		"@std/encoding": "jsr:@std/encoding@^1.0.2",
 		"@std/http": "jsr:@std/http@^0.224.4",
 		"env": "jsr:@std/dotenv/load",
-		"hono": "jsr:@hono/hono@^4.5.6"
+		"hono": "jsr:@hono/hono@^4.6.3",
+		"magick": "https://esm.sh/@imagemagick/magick-wasm@0.0.30"
 	},
 	"fmt": {
 		"useTabs": true,

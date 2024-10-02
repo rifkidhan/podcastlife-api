@@ -1,11 +1,13 @@
 import { FeedObject } from "https://esm.sh/podcast-partytime@4.8.0";
 import { feedParser } from "#/models/parsefeed.ts";
+import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 type Unpack<T> = T extends (infer U)[] ? U : T;
 
 export type PodcastLiveItem = Unpack<FeedObject["podcastLiveItems"]> & {
   feedId: string;
   feedTitle: string;
+  feedImage?: string;
 };
 
 export interface GetLiveParams {
@@ -21,22 +23,20 @@ export const getLiveItem = async ({ id, author, url }: GetLiveParams) => {
 
   if (!liveStream) return undefined;
 
-  return liveStream.map((item) => {
-    if (item.image === "" || typeof item.image === "undefined") {
-      return {
-        ...item,
-        image: feed.image?.url,
-        feedTitle: feed.title,
-        feedId: id,
-        author: item.author ?? feed.author ?? author,
-      };
-    }
+  const results: PodcastLiveItem[] = [];
 
-    return {
-      ...item,
+  for (const live of liveStream) {
+    const description = await sanitizeHTML(live.description, []);
+
+    results.push({
+      ...live,
+      description,
       feedTitle: feed.title,
       feedId: id,
-      author: item.author ?? feed.author ?? author,
-    };
-  });
+      author: live.author ?? feed.author ?? author,
+      feedImage: feed.image?.url,
+    });
+  }
+
+  return results;
 };

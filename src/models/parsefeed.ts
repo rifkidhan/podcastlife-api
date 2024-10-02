@@ -1,6 +1,8 @@
-import { parseFeed } from "https://esm.sh/podcast-partytime@4.8.0";
+import { parseFeed, FeedObject } from "https://esm.sh/podcast-partytime@4.8.0";
 
 const userAgent = Deno.env.get("USER_AGENT");
+
+export type { FeedObject };
 
 export const feedParser = async (url: string) => {
   if (!userAgent) {
@@ -25,5 +27,6 @@ export const feedParser = async (url: string) => {
     return null;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };

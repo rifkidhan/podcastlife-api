@@ -5,3 +5,4 @@ node_modules
 .xata
 .helix
 .zed
+updateBlurHash.ts

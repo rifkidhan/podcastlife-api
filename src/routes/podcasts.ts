@@ -1,14 +1,24 @@
 import { podcastApi } from "#/models/podcastapi.ts";
-import { feedParser } from "#/models/parsefeed.ts";
+import { type FeedObject, feedParser } from "#/models/parsefeed.ts";
 import { groupingCategories, integer, language } from "#/helpers/matching.ts";
 import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { STATUS_CODE, STATUS_TEXT } from "@std/http/status";
+import { cache } from "hono/cache";
 import { logs } from "#/middlerwares/log.ts";
-import { cache } from "#/middlerwares/cache.ts";
-import { CategoryPodcastRecord, DatabaseSchema, getXataClient, PodcastsRecord } from "#/db/xata.ts";
-import { Page, SelectedPick, TransactionOperation } from "npm:@xata.io/client@latest";
+import {
+  CategoryPodcastRecord,
+  DatabaseSchema,
+  getXataClient,
+  PodcastsRecord,
+} from "#/db/xata.ts";
+import {
+  Page,
+  SelectedPick,
+  TransactionOperation,
+} from "npm:@xata.io/client@latest";
+import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 const xata = getXataClient();
 
@@ -18,28 +28,36 @@ const podcast = new Hono();
 podcast.get(
   "/podcast/*",
   cache({
-    cacheControl: "public, max-age=7200, stale-while-revalidate=3600",
+    cacheName: "podcastlife-podcast",
+    cacheControl: "max-age=3600",
+    wait: true,
   }),
 );
 
 podcast.get(
   "/trending",
   cache({
-    cacheControl: "public, max-age=1800, stale-while-revalidate=1800",
+    cacheName: "podcastlife-podcast",
+    cacheControl: "max-age=600",
+    wait: true,
   }),
 );
 
 podcast.get(
   "/tags/*",
   cache({
-    cacheControl: "public, max-age=86400, stale-while-revalidate=86400",
+    cacheName: "podcastlife-podcast",
+    cacheControl: "max-age=86400",
+    wait: true,
   }),
 );
 
 podcast.get(
   "/recent",
   cache({
-    cacheControl: "public, max-age=7200, stale-while-revalidate=1800",
+    cacheName: "podcastlife-podcast",
+    cacheControl: "max-age=3600",
+    wait: true,
   }),
 );
 
@@ -56,46 +74,49 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
     return c.notFound();
   }
 
-  const items = await feedParser(data.url);
+  const result = await feedParser(data.url);
 
+  if (!result) {
+    return c.notFound();
+  }
+
+  const { items, podcastLiveItems, ...feed } = result;
+
+  const description = await sanitizeHTML(data.description, []);
+  const episodeItems: FeedObject["items"] = [];
+
+  const liveItems: FeedObject["podcastLiveItems"] = [];
+
+  for (const item of items) {
+    const description = await sanitizeHTML(item.description, []);
+    const summary = await sanitizeHTML(item.summary, []);
+    const subtitle = await sanitizeHTML(item.subtitle, []);
+
+    episodeItems.push({ ...item, description, summary, subtitle });
+  }
+
+  if (podcastLiveItems) {
+    for (const item of podcastLiveItems) {
+      const description = await sanitizeHTML(item.description, []);
+
+      liveItems.push({ ...item, description });
+    }
+  }
   logs("get full podcast data from : ", id);
 
   return c.json(
     {
       data: {
         feed: {
-          ...data,
-          value: items?.value,
-          copyright: items?.copyright,
+          ...feed,
+          description,
+          value: feed.value,
+          copyright: feed.copyright,
+          blurhash: data.blurhash,
         },
-        episodes: items?.items,
-        lives: items?.podcastLiveItems,
+        episodes: episodeItems,
+        lives: liveItems,
       },
-    },
-    STATUS_CODE.OK,
-  );
-});
-
-/**
- * Get Episodes from request url
- * require url from podcast
- */
-podcast.get("/podcast/url", async (c) => {
-  const { url } = c.req.query();
-
-  if (!url) {
-    throw new HTTPException(STATUS_CODE["BadRequest"], {
-      message: STATUS_TEXT[STATUS_CODE["BadRequest"]],
-    });
-  }
-
-  const items = await feedParser(url);
-
-  logs("get episodes url data from : ", url);
-
-  return c.json(
-    {
-      data: items,
     },
     STATUS_CODE.OK,
   );
@@ -140,9 +161,9 @@ podcast.get("/trending", async (c) => {
     errorPodcastApi(trending.status);
   }
 
-  const data = await trending.json();
+  const result = await trending.json();
 
-  const getPodcasts = data.feeds.map((item: any) => {
+  const getPodcasts = result.feeds.map((item: any) => {
     return {
       get: {
         table: "podcasts",
@@ -167,7 +188,7 @@ podcast.get("/trending", async (c) => {
       .filter((item: any) => typeof item.columns.id === "string")
       .map((item: any) => {
         return item.columns;
-      })
+      }),
   );
 
   return c.json({ data: fromDB }, STATUS_CODE.OK);

@@ -4,7 +4,7 @@
 
 import "env";
 import { getXataClient } from "#/db/xata.ts";
-import csv from "npm:convert-csv-to-json";
+import { parse } from "jsr:@std/csv";
 
 const xata = getXataClient();
 
@@ -19,21 +19,45 @@ const removeDeadPodcast = async () => {
   const data = await csvData.text();
 
   console.log("fetch done, convert to json.");
-  const jsonDead = csv.fieldDelimiter(",").csvStringToJson(data);
+  const jsonDead = parse(data, { columns: ["id", "duplicate"] });
   console.log("convert done.");
 
   const limit = 1000;
-  let batch = 1;
-  let deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
+  const totalSlice = Math.ceil(jsonDead.length / limit);
 
-  // TODO: error for automation
-  while (deleteRecords.length > 0) {
+  const range = {
+    start: (part: number) => {
+      return (part - 1) * limit;
+    },
+    end: (part: number) => {
+      const start = (part - 1) * limit;
+      return Math.min(start + totalSlice);
+    },
+  };
+
+  let batch = 2727;
+
+  let deleteRecords = jsonDead.slice(range.start(batch), range.end(batch));
+
+  try {
     console.log("remove dead podcast batch:", batch);
-    await xata.db.podcasts.delete(
-      deleteRecords.map((item: any) => item["3"]),
-    );
+    await xata.db.podcasts.delete(deleteRecords.map((item) => item.id));
+    console.log("remove dead podcast batch:", batch, " successfully.");
+  } catch (e) {
+    console.log(e);
+  }
+
+  while (batch < totalSlice) {
     batch++;
-    deleteRecords = jsonDead.slice((batch - 1) * limit, limit * batch);
+    deleteRecords = jsonDead.slice(range.start(batch), range.end(batch));
+
+    try {
+      console.log("remove dead podcast batch:", batch);
+      await xata.db.podcasts.delete(deleteRecords.map((item) => item.id));
+      console.log("remove dead podcast batch:", batch, " successfully.");
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   console.log("remove orphan categorymap");

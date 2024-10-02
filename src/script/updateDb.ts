@@ -2,6 +2,7 @@ import { podcastApi } from "#/models/podcastapi.ts";
 import { groupingCategories, integer, language } from "#/helpers/matching.ts";
 import { DatabaseSchema, getXataClient, Podcasts } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
+import { initialize, transform } from "#/helpers/image.ts";
 
 interface FeedUpdate {
   id: string;
@@ -12,11 +13,14 @@ interface FeedUpdate {
   itunesId?: number;
   image?: string;
   language: string;
+  blurhash?: string;
 }
 
 const xata = getXataClient();
 
 export const updateDB = async () => {
+  await initialize();
+
   const times = Math.floor(Date.now() / 1000) - 7200;
   const newfeed = await podcastApi(`/recent/feeds`, {
     max: "1000",
@@ -57,10 +61,7 @@ const checkDataExist = async (feeds: FeedUpdate[]) => {
           columns: ["id"],
         },
       };
-    }) satisfies TransactionOperation<
-      DatabaseSchema,
-      keyof DatabaseSchema
-    >[];
+    }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
 
     const data = await xata.transactions.run(getPodcasts);
 
@@ -94,6 +95,14 @@ const checkDataExist = async (feeds: FeedUpdate[]) => {
 const updateFeeds = async (feeds: FeedUpdate[]) => {
   console.log("update feeds begin");
 
+  const hashes = new Map<string, string | null>();
+
+  for (const feed of feeds) {
+    const hash = await transform(feed.image);
+    hashes.set(feed.id, hash);
+    console.log("update blurhash: ", feed.id);
+  }
+
   const trxUpdate = feeds.map((item) => {
     return {
       update: {
@@ -104,6 +113,7 @@ const updateFeeds = async (feeds: FeedUpdate[]) => {
           oldestItemPubdate: item.oldestItemPublishTime,
           image: item.image,
           url: item.url,
+          blurhash: hashes.get(item.id),
         },
       },
     };
@@ -133,6 +143,8 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
         .split(",")
         .filter((n) => integer(n) === false);
 
+      const hash = await transform(data.image);
+
       const putItem: Podcasts = {
         id: String(data.id),
         title: data.title,
@@ -151,6 +163,7 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
         language: data.language,
         explicit: data.explicit,
         tags,
+        blurhash: hash,
       };
 
       podcasts.push(putItem);
@@ -164,8 +177,7 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
 
   console.log("mapping feeds category");
 
-  const categories = await xata.db.categories.select(["id", "title"])
-    .getAll();
+  const categories = await xata.db.categories.select(["id", "title"]).getAll();
 
   let batch = 0;
 
@@ -173,7 +185,7 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
     const cat = groupingCategories(categories[batch].title);
 
     const podcast = podcasts.filter((item) =>
-      cat.some((tag) => item.tags?.includes(tag))
+      cat.some((tag) => item.tags?.includes(tag)),
     );
 
     if (podcast.length > 0) {
