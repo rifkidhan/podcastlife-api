@@ -120,7 +120,18 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
           value: feed.value,
           copyright: feed.copyright,
         },
-        episodes: episodeItems,
+        episodes: episodeItems.map((item) => {
+          const season = item.itunesSeason ?? item.podcastSeason?.number
+          const episode = item.itunesEpisode ?? item.podcastEpisode?.number
+          const episodeType = item.itunesEpisodeType
+
+          return {
+            ...item,
+            season,
+            episode,
+            episodeType
+          }
+        }),
         lives: liveItems,
       },
     },
