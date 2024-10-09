@@ -85,8 +85,8 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
   const [description, subtitle, summary] = await Promise.all([
     sanitizeHTML(data.description, []),
     sanitizeHTML(feed.subtitle, []),
-    sanitizeHTML(feed.summary, [])
-  ])
+    sanitizeHTML(feed.summary, []),
+  ]);
 
   const episodeItems: FeedObject["items"] = [];
 
@@ -121,16 +121,16 @@ podcast.get("/podcast/feed/:feedId", async (c) => {
           copyright: feed.copyright,
         },
         episodes: episodeItems.map((item) => {
-          const season = item.itunesSeason ?? item.podcastSeason?.number
-          const episode = item.itunesEpisode ?? item.podcastEpisode?.number
-          const episodeType = item.itunesEpisodeType
+          const season = item.itunesSeason ?? item.podcastSeason?.number;
+          const episode = item.itunesEpisode ?? item.podcastEpisode?.number;
+          const episodeType = item.itunesEpisodeType;
 
           return {
             ...item,
             season,
             episode,
-            episodeType
-          }
+            episodeType,
+          };
         }),
         lives: liveItems,
       },
@@ -193,8 +193,8 @@ podcast.get("/trending", async (c) => {
           "owner",
           "newestItemPubdate",
           "image",
-          "description",
           "tags",
+          "blurhash",
         ],
       },
     };
@@ -230,13 +230,13 @@ podcast.get("/tags/:tag", async (c) => {
       PodcastsRecord,
       (
         | "title"
-        | "description"
         | "image"
         | "explicit"
         | "author"
         | "owner"
         | "newestItemPubdate"
         | "id"
+        | "blurhash"
       )[]
     >
   >;
@@ -249,11 +249,11 @@ podcast.get("/tags/:tag", async (c) => {
         "id",
         "title",
         "newestItemPubdate",
-        "description",
         "image",
         "explicit",
         "owner",
         "author",
+        "blurhash",
       ])
       .filter({
         tags: { $includes: tag },
@@ -274,11 +274,11 @@ podcast.get("/tags/:tag", async (c) => {
         "id",
         "title",
         "newestItemPubdate",
-        "description",
         "image",
         "explicit",
         "owner",
         "author",
+        "blurhash",
       ])
       .filter({
         tags: { $includes: tag },
@@ -337,9 +337,9 @@ podcast.get("/recent", async (c) => {
           | "podcast.owner"
           | "podcast.explicit"
           | "podcast.newestItemPubdate"
-          | "podcast.description"
           | "podcast.image"
           | "podcast.tags"
+          | "podcast.blurhash"
         )[]
       >
     >;
@@ -354,9 +354,9 @@ podcast.get("/recent", async (c) => {
           "podcast.owner",
           "podcast.explicit",
           "podcast.newestItemPubdate",
-          "podcast.description",
           "podcast.image",
           "podcast.tags",
+          "podcast.blurhash",
         ])
         .filter({
           "category.id": group.id,
@@ -375,9 +375,9 @@ podcast.get("/recent", async (c) => {
           "podcast.owner",
           "podcast.explicit",
           "podcast.newestItemPubdate",
-          "podcast.description",
           "podcast.image",
           "podcast.tags",
+          "podcast.blurhash",
         ])
         .filter({
           "category.id": group.id,
@@ -397,13 +397,13 @@ podcast.get("/recent", async (c) => {
         (
           | "id"
           | "title"
-          | "description"
           | "image"
           | "explicit"
           | "author"
           | "owner"
           | "newestItemPubdate"
           | "tags"
+          | "blurhash"
         )[]
       >
     >;
@@ -415,12 +415,12 @@ podcast.get("/recent", async (c) => {
           "id",
           "title",
           "newestItemPubdate",
-          "description",
           "image",
           "explicit",
           "owner",
           "author",
           "tags",
+          "blurhash",
         ])
         .filter({
           language: { $any: languages },
@@ -435,12 +435,12 @@ podcast.get("/recent", async (c) => {
           "id",
           "title",
           "newestItemPubdate",
-          "description",
           "image",
           "explicit",
           "owner",
           "author",
           "tags",
+          "blurhash",
         ])
         .sort("newestItemPubdate", "desc")
         .getPaginated({

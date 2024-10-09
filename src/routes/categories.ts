@@ -28,6 +28,7 @@ type Data = {
   owner?: string | null;
   description?: string | null;
   image?: string | null;
+  blurhash?: string | null;
 };
 
 /**
@@ -66,6 +67,7 @@ category.get("/:categoryName", async (c) => {
         | "podcast.author"
         | "podcast.owner"
         | "podcast.newestItemPubdate"
+        | "podcast.blurhash"
       )[]
     >
   >;
@@ -82,6 +84,7 @@ category.get("/:categoryName", async (c) => {
         "podcast.newestItemPubdate",
         "podcast.description",
         "podcast.image",
+        "podcast.blurhash",
       ])
       .filter({
         "category.id": group.id,
@@ -107,6 +110,7 @@ category.get("/:categoryName", async (c) => {
         "podcast.newestItemPubdate",
         "podcast.description",
         "podcast.image",
+        "podcast.blurhash",
       ])
       .filter({
         "category.id": group.id,
@@ -138,6 +142,7 @@ category.get("/:categoryName", async (c) => {
       newestItemPubdate: item.podcast?.newestItemPubdate ?? 0,
       description,
       image: item.podcast?.image,
+      blurhash: item.podcast?.blurhash,
     });
   }
 

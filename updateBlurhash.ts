@@ -9,13 +9,13 @@ await initialize();
 
 const update = async () => {
   let podcast = await xata.db.podcasts
-    .select(["id", "image"])
+    .select(["id", "image", "blurhash"])
     .filter({
       $notExists: "blurhash",
     })
     .getPaginated({
       pagination: {
-        size: 200,
+        size: 250,
       },
       consistency: "eventual",
     });
