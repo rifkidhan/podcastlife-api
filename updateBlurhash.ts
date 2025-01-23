@@ -1,6 +1,14 @@
 import "env";
-import { DatabaseSchema, getXataClient } from "#/db/xata.ts";
-import { TransactionOperation } from "npm:@xata.io/client@latest";
+import {
+  DatabaseSchema,
+  getXataClient,
+  type PodcastsRecord,
+} from "#/db/xata.ts";
+import {
+  TransactionOperation,
+  type Page,
+  type SelectedPick,
+} from "npm:@xata.io/client@latest";
 import { initialize, transform } from "#/helpers/image.ts";
 
 const xata = getXataClient();
@@ -9,9 +17,9 @@ await initialize();
 
 const update = async () => {
   let podcast = await xata.db.podcasts
-    .select(["id", "image", "blurhash"])
+    .select(["id", "image", "blurhash", "blurhashError"])
     .filter({
-      $notExists: "blurhash",
+      $all: [{ $notExists: "blurhash" }, { blurhashError: false }],
     })
     .getPaginated({
       pagination: {
@@ -20,6 +28,8 @@ const update = async () => {
       consistency: "eventual",
     });
 
+  let batch = 1;
+  let blurhashErrorProcess = false;
   const hashes = new Map<string, string | null>();
 
   for (const feed of podcast.records) {
@@ -28,9 +38,7 @@ const update = async () => {
     hashes.set(feed.id, hash);
   }
 
-  let batch = 1;
-
-  const updater = podcast.records.map((item) => {
+  let updater = podcast.records.map((item) => {
     return {
       update: {
         table: "podcasts",
@@ -48,20 +56,43 @@ const update = async () => {
     hashes.clear();
   } catch (e) {
     console.log(e.status);
+    blurhashErrorProcess = true;
+  }
+
+  if (blurhashErrorProcess) {
+    const blurhashError = podcast.records.map((item) => {
+      return {
+        update: {
+          table: "podcasts",
+          id: item.id,
+          fields: {
+            blurhashError: true,
+          },
+        },
+      };
+    }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
+
+    try {
+      console.log("writing error");
+      await xata.transactions.run(blurhashError);
+      blurhashErrorProcess = false;
+    } catch (e) {
+      console.log(e.status);
+      blurhashErrorProcess = false;
+    }
   }
 
   while (podcast.hasNextPage) {
     podcast = await podcast.nextPage();
 
+    batch++;
     for (const feed of podcast.records) {
       const hash = await transform(feed.image);
       console.log("blurhash complete", feed.id);
       hashes.set(feed.id, hash);
     }
 
-    batch++;
-
-    const updater = podcast.records.map((item) => {
+    updater = podcast.records.map((item) => {
       return {
         update: {
           table: "podcasts",
@@ -79,6 +110,30 @@ const update = async () => {
       hashes.clear();
     } catch (e) {
       console.log(e.status);
+      blurhashErrorProcess = true;
+    }
+
+    if (blurhashErrorProcess) {
+      const blurhashError = podcast.records.map((item) => {
+        return {
+          update: {
+            table: "podcasts",
+            id: item.id,
+            fields: {
+              blurhashError: true,
+            },
+          },
+        };
+      }) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
+
+      try {
+        console.log("writing error");
+        await xata.transactions.run(blurhashError);
+        blurhashErrorProcess = false;
+      } catch (e) {
+        console.log(e.status);
+        blurhashErrorProcess = false;
+      }
     }
   }
 

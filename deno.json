@@ -1,18 +1,18 @@
 {
 	"$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
 	"tasks": {
-		"dev": "deno run -REN --watch main.ts",
-		"start": "deno run -REN main.ts",
+		"dev": "deno run -RENS --watch main.ts",
+		"start": "deno run -RENS main.ts",
 		"rmpodcast": "deno run -REN src/script/removeDeadPodcast.ts"
 	},
 	"imports": {
 		"#/": "./src/",
 		"@std/crypto": "jsr:@std/crypto@^1.0.2",
-		"@std/encoding": "jsr:@std/encoding@^1.0.2",
-		"@std/http": "jsr:@std/http@^0.224.4",
-		"env": "jsr:@std/dotenv/load",
-		"hono": "jsr:@hono/hono@^4.6.3",
-		"magick": "https://esm.sh/@imagemagick/magick-wasm@0.0.30"
+		"@std/encoding": "jsr:@std/encoding@^1.0.6",
+		"@std/http": "jsr:@std/http@^1.0.12",
+		"env": "jsr:@std/dotenv@^0.225.3/load",
+		"@hono/hono": "jsr:@hono/hono@^4.6.17",
+		"podcast-partytime": "https://esm.sh/podcast-partytime"
 	},
 	"fmt": {
 		"useTabs": true,

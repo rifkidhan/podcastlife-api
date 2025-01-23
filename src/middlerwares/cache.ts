@@ -1,32 +1,32 @@
-import type { MiddlewareHandler } from "hono";
+import type { MiddlewareHandler } from "@hono/hono";
 import { Cachest } from "#/utils/cache-provider.ts";
 
 export const cache = (options: {
-  cacheControl?: string;
+	cacheControl?: string;
 }): MiddlewareHandler => {
-  const addHeader = (response: Response) => {
-    if (options.cacheControl) {
-      response.headers.set("Cache-Control", options.cacheControl);
-    }
-  };
+	const addHeader = (response: Response) => {
+		if (options.cacheControl) {
+			response.headers.set("Cache-Control", options.cacheControl);
+		}
+	};
 
-  const provider = new Cachest();
+	const provider = new Cachest();
 
-  return async (c, next) => {
-    const key = c.req.url;
+	return async (c, next) => {
+		const key = c.req.url;
 
-    const response = await provider.get(key);
+		const response = await provider.get(key);
 
-    if (!response) {
-      await next();
-      if (!c.res.ok) {
-        return;
-      }
-      addHeader(c.res);
-      const response = c.res.clone();
-      provider.set(c.req.url, response);
-    } else {
-      return new Response(response.body, response);
-    }
-  };
+		if (!response) {
+			await next();
+			if (!c.res.ok) {
+				return;
+			}
+			addHeader(c.res);
+			const response = c.res.clone();
+			provider.set(c.req.url, response);
+		} else {
+			return new Response(response.body, response);
+		}
+	};
 };

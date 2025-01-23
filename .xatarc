@@ -1,7 +1,7 @@
 {
-  "databaseURL": "https://Rifki-Ramadhan-s-workspace-6jdd8b.us-east-1.xata.sh/db/podcastlife",
-  "codegen": {
-    "output": "src/db/xata.ts",
-    "moduleType": "deno"
-  }
+	"databaseURL": "https://Rifki-Ramadhan-s-workspace-6jdd8b.us-east-1.xata.sh/db/podcastlife",
+	"codegen": {
+		"output": "src/db/xata.ts",
+		"moduleType": "deno"
+	}
 }
