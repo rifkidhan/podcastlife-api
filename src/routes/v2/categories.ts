@@ -5,6 +5,7 @@ import { language } from "#/helpers/matching.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "@hono/hono/cache";
 import { HTTPException } from "@hono/hono/http-exception";
+import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 const app = new Hono();
 const xata = getXataClient();
@@ -73,12 +74,21 @@ app.get("/:cat", async (c) => {
 			},
 		});
 
+	// deno-lint-ignore no-explicit-any
+	const result: any[] = [];
+
+	for (const item of res.records) {
+		const description = await sanitizeHTML(item.podcast?.description, []);
+
+		result.push({
+			...item.podcast,
+			description,
+		});
+	}
+
 	return c.json({
-		data: res.records.map((item) => {
-			return {
-				...item.podcast,
-			};
-		}),
+		data: result,
+		meta: res.meta,
 	});
 });
 
