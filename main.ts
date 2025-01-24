@@ -8,9 +8,11 @@ import { serveStatic } from "@hono/hono/deno";
 import { default as categoriesV1 } from "#/routes/v1/categories.ts";
 import { default as podcastsV1 } from "#/routes/v1/podcasts.ts";
 import { default as episodesV1 } from "#/routes/v1/episodes.ts";
-import { STATUS_CODE } from "@std/http/status";
+import { default as podcasts } from "#/routes/v2/podcasts.ts";
+import { default as categories } from "#/routes/v2/categories.ts";
 import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
+import { except } from "@hono/hono/combine";
 
 const isDev = Deno.env.get("DEV");
 if (!isDev) {
@@ -27,11 +29,12 @@ const app = new Hono();
  * middleware
  */
 app.use(
-	"/v1/*",
-	bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
-	etag({
-		retainedHeaders: [...RETAINED_304_HEADERS],
-	}),
+	"*",
+	except(
+		"/",
+		bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
+		etag({ retainedHeaders: [...RETAINED_304_HEADERS] }),
+	),
 );
 
 /**
@@ -48,7 +51,7 @@ app.use("/favicon.ico", serveStatic({ path: "./favicon.ico" }));
  * Response for not found
  */
 app.notFound((c) => {
-	return c.text("Your request not found!", STATUS_CODE.NotFound);
+	return c.text("Your request not found!", 404);
 });
 
 /**
@@ -59,16 +62,25 @@ app.onError((err, c) => {
 		return err.getResponse();
 	}
 	console.error(err);
-	return c.json({ message: err.message }, STATUS_CODE.InternalServerError);
+	return c.text(err.message, 500);
 });
 
 app.get("/", (c) => {
 	return c.text("Podcastlife API");
 });
 
+/**
+ * v1 route
+ */
 app.route("/v1/podcasts", podcastsV1);
 app.route("/v1/categories", categoriesV1);
 app.route("/v1/episodes", episodesV1);
+
+/**
+ * v2 route
+ */
+app.route("/v2/", podcasts);
+app.route("/v2/categories", categories);
 
 console.log("Podcastlife API");
 Deno.serve(app.fetch);

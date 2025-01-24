@@ -11,7 +11,7 @@
 		"@std/encoding": "jsr:@std/encoding@^1.0.6",
 		"@std/http": "jsr:@std/http@^1.0.12",
 		"env": "jsr:@std/dotenv@^0.225.3/load",
-		"@hono/hono": "jsr:@hono/hono@^4.6.17",
+		"@hono/hono": "jsr:@hono/hono@^4.6.18",
 		"podcast-partytime": "https://esm.sh/podcast-partytime"
 	},
 	"fmt": {

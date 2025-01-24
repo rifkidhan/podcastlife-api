@@ -8,6 +8,18 @@ import { CategoryPodcastRecord, getXataClient } from "#/db/xata.ts";
 import { Page, SelectedPick } from "npm:@xata.io/client@latest";
 import { sanitizeHTML } from "#/utils/sanitize.ts";
 
+type Data = {
+	id?: string;
+	title?: string;
+	explicit: boolean;
+	newestItemPubdate: number;
+	author?: string | null;
+	owner?: string | null;
+	description?: string | null;
+	image?: string | null;
+	blurhash?: string | null;
+};
+
 const category = new Hono();
 
 const xata = getXataClient();
@@ -20,18 +32,6 @@ category.get(
 		wait: true,
 	}),
 );
-
-type Data = {
-	id?: string;
-	title?: string;
-	explicit: boolean;
-	newestItemPubdate: number;
-	author?: string | null;
-	owner?: string | null;
-	description?: string | null;
-	image?: string | null;
-	blurhash?: string | null;
-};
 
 /**
  * Get All Podcast from Category

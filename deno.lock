@@ -1,7 +1,7 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@hono/hono@^4.6.17": "4.6.17",
+    "jsr:@hono/hono@^4.6.18": "4.6.18",
     "jsr:@std/bytes@^1.0.3": "1.0.4",
     "jsr:@std/cli@^1.0.8": "1.0.10",
     "jsr:@std/crypto@^1.0.2": "1.0.3",
@@ -20,8 +20,8 @@
     "npm:@xata.io/client@latest": "0.30.1_typescript@5.7.3"
   },
   "jsr": {
-    "@hono/hono@4.6.17": {
-      "integrity": "932fcc61d043b14a8b2cb65242716eb32da44e91f2ee117fd7390508669fea31"
+    "@hono/hono@4.6.18": {
+      "integrity": "0759311509fc19b77ada512c7df29d181cf3f5c5ddd599605c1adce127aaaadc"
     },
     "@std/bytes@1.0.4": {
       "integrity": "11a0debe522707c95c7b7ef89b478c13fb1583a7cfb9a85674cd2cc2e3a28abc"
@@ -326,7 +326,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@hono/hono@^4.6.17",
+      "jsr:@hono/hono@^4.6.18",
       "jsr:@std/crypto@^1.0.2",
       "jsr:@std/dotenv@~0.225.3",
       "jsr:@std/encoding@^1.0.6",
