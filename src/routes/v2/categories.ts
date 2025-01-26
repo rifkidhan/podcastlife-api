@@ -13,7 +13,7 @@ const xata = getXataClient();
 app.get(
 	"/*",
 	cache({
-		cacheName: "podcastlife",
+		cacheName: "podcastlife-category",
 		cacheControl: "max-age=7200",
 		wait: true,
 	}),
@@ -38,7 +38,7 @@ app.get("/:cat", async (c) => {
 	if (!group) {
 		return c.notFound();
 	}
-	logs(lang);
+	logs(cat);
 
 	const languages = language(lang).split(",");
 

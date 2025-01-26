@@ -29,11 +29,11 @@ const app = new Hono();
  * middleware
  */
 app.use(
-	"*",
+	"/*",
 	except(
 		"/",
 		bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
-		etag({ retainedHeaders: [...RETAINED_304_HEADERS] }),
+		etag(),
 	),
 );
 

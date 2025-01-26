@@ -21,7 +21,7 @@ const app = new Hono();
 app.get(
 	"/feed/*",
 	cache({
-		cacheName: "podcastlife",
+		cacheName: "podcastlife-feed",
 		cacheControl: "max-age=7200",
 		wait: true,
 	}),
@@ -30,7 +30,7 @@ app.get(
 app.get(
 	"/trending",
 	cache({
-		cacheName: "podcastlife",
+		cacheName: "podcastlife-trending",
 		cacheControl: "max-age=7200",
 		wait: true,
 	}),
@@ -39,7 +39,7 @@ app.get(
 app.get(
 	"/recent",
 	cache({
-		cacheName: "podcastlife",
+		cacheName: "podcastlife-recent",
 		cacheControl: "max-age=7200",
 		wait: true,
 	}),
@@ -48,7 +48,7 @@ app.get(
 app.get(
 	"/live",
 	cache({
-		cacheName: "podcastlife",
+		cacheName: "podcastlife-live",
 		cacheControl: "max-age=720",
 		wait: true,
 	}),
