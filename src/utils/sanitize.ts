@@ -1,7 +1,7 @@
-import { unified } from "https://esm.sh/unified@11";
-import rehypeSanitize from "https://esm.sh/rehype-sanitize@6";
-import rehypeParse from "https://esm.sh/rehype-parse@9";
-import rehypeStringify from "https://esm.sh/rehype-stringify@10";
+import { unified } from "unified";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeParse from "rehype-parse";
+import rehypeStringify from "rehype-stringify";
 
 export const sanitizeHTML = async (
 	content?: string | null,

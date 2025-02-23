@@ -55,6 +55,7 @@ const tables = [
       },
       { name: "blurhash", type: "text" },
       { name: "blurhashError", type: "bool", defaultValue: "false" },
+      { name: "image_alt", type: "text" },
     ],
     revLinks: [{ column: "podcast", table: "category_podcast" }],
   },

@@ -5,15 +5,15 @@ import {
   type PodcastsRecord,
 } from "#/db/xata.ts";
 import {
-  TransactionOperation,
   type Page,
   type SelectedPick,
+  TransactionOperation,
 } from "npm:@xata.io/client@latest";
-import { initialize, transform } from "#/helpers/image.ts";
+import { initializeImageMagick, transform } from "#/helpers/image.ts";
 
 const xata = getXataClient();
 
-await initialize();
+await initializeImageMagick();
 
 const update = async () => {
   let podcast = await xata.db.podcasts

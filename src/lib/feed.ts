@@ -1,4 +1,4 @@
-import { FeedObject, parseFeed } from "https://esm.sh/podcast-partytime@4.9.1";
+import { FeedObject, parseFeed } from "podcast-partytime";
 import { USER_AGENT } from "#/helpers/constants.ts";
 
 export type { FeedObject };
