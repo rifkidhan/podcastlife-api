@@ -7,16 +7,16 @@
 	},
 	"imports": {
 		"#/": "./src/",
-		"@std/crypto": "jsr:@std/crypto@^1.0.4",
-		"@std/encoding": "jsr:@std/encoding@^1.0.7",
-		"@std/http": "jsr:@std/http@^1.0.13",
-		"env": "jsr:@std/dotenv@^0.225.3/load",
-		"@hono/hono": "jsr:@hono/hono@^4.7.2",
-		"podcast-partytime": "npm:podcast-partytime",
+		"@std/crypto": "jsr:@std/crypto@^1.0.5",
+		"@std/encoding": "jsr:@std/encoding@^1.0.10",
+		"@std/http": "jsr:@std/http@^1.0.20",
+		"blurhash": "npm:blurhash@^2.0.5",
+		"env": "jsr:@std/dotenv@^0.225.5/load",
+		"@hono/hono": "jsr:@hono/hono@^4.9.2",
+		"podcast-partytime": "npm:podcast-partytime@4.9.1",
 		"rehype-parse": "npm:rehype-parse@^9.0.1",
 		"rehype-sanitize": "npm:rehype-sanitize@^6.0.0",
 		"rehype-stringify": "npm:rehype-stringify@^10.0.1",
-		"s3-lite-client": "jsr:@bradenmacdonald/s3-lite-client@^0.8.0",
 		"unified": "npm:unified@^11.0.5"
 	},
 	"fmt": {

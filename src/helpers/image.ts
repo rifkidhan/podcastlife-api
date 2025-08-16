@@ -6,6 +6,7 @@ import {
 	Percentage,
 } from "https://deno.land/x/imagemagick_deno@0.0.31/mod.ts";
 import { encodeBase64 } from "@std/encoding";
+import { encode } from "blurhash";
 
 export async function initializeImageMagick() {
 	await initialize();
@@ -51,7 +52,6 @@ export async function transform(
 
 const getImageData = (source: Uint8Array) => {
 	const size = new MagickGeometry(8);
-	size.fillArea = true;
 
 	return new Promise<Uint8Array>((resolve) => {
 		ImageMagick.read(source, (image) => {
@@ -60,6 +60,49 @@ const getImageData = (source: Uint8Array) => {
 			image.adaptiveBlur(4);
 			image.normalize();
 			image.write(MagickFormat.Png, (data) => resolve(data));
+		});
+	});
+};
+
+export async function transformBlurhash(
+	url: string | undefined | null,
+): Promise<string | null> {
+	if (typeof url === "undefined" || url === "" || url === null) return null;
+
+	try {
+		const response = await fetch(url, { signal: AbortSignal.timeout(50000) });
+
+		if (response.ok) {
+			const imageFile = await response.arrayBuffer();
+
+			const blurhash = await getBlurhash(new Uint8Array(imageFile));
+
+			return blurhash;
+		}
+
+		return null;
+	} catch (error) {
+		console.error(error);
+
+		return null;
+	}
+}
+
+const getBlurhash = (source: Uint8Array) => {
+	const size = new MagickGeometry(12);
+	size.fillArea = true;
+
+	return new Promise<string>((resolve) => {
+		ImageMagick.read(source, (image) => {
+			image.resize(size);
+			image.format = MagickFormat.Rgba;
+
+			image.write((data) => {
+				const clamped_array = Uint8ClampedArray.from(data);
+				const blurhash = encode(clamped_array, image.width, image.height, 4, 4);
+
+				resolve(blurhash);
+			});
 		});
 	});
 };

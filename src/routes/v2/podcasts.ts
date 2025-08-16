@@ -227,6 +227,7 @@ app.get("/trending", async (c) => {
 					"image",
 					"tags",
 					"blurhash",
+					"hash",
 				],
 			},
 		};
@@ -261,6 +262,7 @@ app.get("/recent", async (c) => {
 			"owner",
 			"author",
 			"blurhash",
+			"hash",
 		])
 		.filter(lang ? { language: { $any: languages } } : undefined)
 		.sort("newestItemPubdate", "desc")

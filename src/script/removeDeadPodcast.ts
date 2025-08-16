@@ -25,6 +25,8 @@ const removeDeadPodcast = async () => {
 	const limit = 1000;
 	const totalSlice = Math.ceil(jsonDead.length / limit);
 
+	console.log("total slices: ", totalSlice);
+
 	const range = {
 		start: (part: number) => {
 			return (part - 1) * limit;
