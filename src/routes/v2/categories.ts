@@ -14,7 +14,7 @@ app.get(
 	"/*",
 	cache({
 		cacheName: "podcastlife-category",
-		cacheControl: "max-age=7200",
+		cacheControl: "max-age=7200, stale-while-revalidate=360",
 		wait: true,
 	}),
 );
@@ -53,6 +53,7 @@ app.get("/:cat", async (c) => {
 			"podcast.description",
 			"podcast.image",
 			"podcast.blurhash",
+			"podcast.hash",
 		])
 		.filter(
 			lang

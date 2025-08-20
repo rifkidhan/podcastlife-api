@@ -3,7 +3,7 @@ import { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import { bearerAuth } from "@hono/hono/bearer-auth";
 import { logger } from "@hono/hono/logger";
-import { etag } from "@hono/hono/etag";
+import { etag, RETAINED_304_HEADERS } from "@hono/hono/etag";
 import { serveStatic } from "@hono/hono/deno";
 import { default as podcasts } from "#/routes/v2/podcasts.ts";
 import { default as categories } from "#/routes/v2/categories.ts";
@@ -30,9 +30,9 @@ const app = new Hono();
 app.use(
 	"/*",
 	except(
-		["/", "/image/*", "/favicon.ico"],
+		["/", "/favicon.ico"],
 		bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
-		etag(),
+		etag({ retainedHeaders: RETAINED_304_HEADERS }),
 	),
 );
 

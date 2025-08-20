@@ -3,6 +3,7 @@ import { groupingCategories, integer, language } from "#/helpers/matching.ts";
 import { DatabaseSchema, getXataClient, Podcasts } from "#/db/xata.ts";
 import { TransactionOperation } from "npm:@xata.io/client@latest";
 import { transformBlurhash } from "#/helpers/image.ts";
+import { CATEGORIES } from "#/helpers/constants.ts";
 
 interface FeedUpdate {
 	id: string;
@@ -176,7 +177,7 @@ const insertFeeds = async (feeds: FeedUpdate[]) => {
 
 	console.log("mapping feeds category");
 
-	const categories = await xata.db.categories.select(["id", "title"]).getAll();
+	const categories = CATEGORIES;
 
 	let batch = 0;
 

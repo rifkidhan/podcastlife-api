@@ -1,7 +1,6 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@bradenmacdonald/s3-lite-client@0.8": "0.8.0",
     "jsr:@hono/hono@^4.9.2": "4.9.2",
     "jsr:@std/bytes@^1.0.3": "1.0.4",
     "jsr:@std/cli@^1.0.21": "1.0.21",
@@ -29,9 +28,6 @@
     "npm:unified@^11.0.5": "11.0.5"
   },
   "jsr": {
-    "@bradenmacdonald/s3-lite-client@0.8.0": {
-      "integrity": "ff78a7d882717f141ab0a360878f75d7036267de9d649e7156991f515671b37d"
-    },
     "@hono/hono@4.9.2": {
       "integrity": "1a8ae7b0d9e4fecef440f991c604e032d5548dc313d1961073ac5d94809be52b"
     },
@@ -804,7 +800,6 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@bradenmacdonald/s3-lite-client@0.8",
       "jsr:@hono/hono@^4.9.2",
       "jsr:@std/crypto@^1.0.5",
       "jsr:@std/dotenv@~0.225.5",

@@ -22,7 +22,7 @@ app.get(
 	"/feed/*",
 	cache({
 		cacheName: "podcastlife-feed",
-		cacheControl: "max-age=7200",
+		cacheControl: "max-age=7200, stale-while-revalidate=360",
 		wait: true,
 	}),
 );
@@ -31,7 +31,7 @@ app.get(
 	"/trending",
 	cache({
 		cacheName: "podcastlife-trending",
-		cacheControl: "max-age=7200",
+		cacheControl: "max-age=7200, stale-while-revalidate=360",
 		wait: true,
 	}),
 );
@@ -40,7 +40,7 @@ app.get(
 	"/recent",
 	cache({
 		cacheName: "podcastlife-recent",
-		cacheControl: "max-age=7200",
+		cacheControl: "max-age=7200, stale-while-revalidate=360",
 		wait: true,
 	}),
 );
@@ -125,7 +125,7 @@ app.get("/feed/:id", async (c) => {
 			}),
 			lives: liveItems,
 		},
-	}, 200);
+	});
 });
 
 /**
@@ -167,7 +167,7 @@ app.get("/feed/:id/:guid", async (c) => {
 				recipients: episode.value?.destinations,
 			},
 		},
-	}, 200);
+	});
 });
 
 /**
@@ -241,7 +241,7 @@ app.get("/trending", async (c) => {
 			})
 	);
 
-	return c.json({ data: fromDB }, 200);
+	return c.json({ data: fromDB });
 });
 
 /**
@@ -272,7 +272,7 @@ app.get("/recent", async (c) => {
 
 	const data = recents.records;
 
-	return c.json({ data: data }, 200);
+	return c.json({ data: data });
 });
 
 /**
@@ -328,7 +328,7 @@ app.get("/live", async (c) => {
 		),
 	);
 
-	return c.json({ data: live }, 200);
+	return c.json({ data: live });
 });
 
 /**
