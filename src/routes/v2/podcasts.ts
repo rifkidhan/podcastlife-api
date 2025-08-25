@@ -22,7 +22,7 @@ app.get(
 	"/feed/*",
 	cache({
 		cacheName: "podcastlife-feed",
-		cacheControl: "max-age=7200, stale-while-revalidate=360",
+		cacheControl: "max-age=7200",
 		wait: true,
 	}),
 );
@@ -31,7 +31,7 @@ app.get(
 	"/trending",
 	cache({
 		cacheName: "podcastlife-trending",
-		cacheControl: "max-age=7200, stale-while-revalidate=360",
+		cacheControl: "max-age=7200",
 		wait: true,
 	}),
 );
@@ -40,7 +40,7 @@ app.get(
 	"/recent",
 	cache({
 		cacheName: "podcastlife-recent",
-		cacheControl: "max-age=7200, stale-while-revalidate=360",
+		cacheControl: "max-age=7200",
 		wait: true,
 	}),
 );

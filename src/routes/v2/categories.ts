@@ -14,7 +14,7 @@ app.get(
 	"/*",
 	cache({
 		cacheName: "podcastlife-category",
-		cacheControl: "max-age=7200, stale-while-revalidate=360",
+		cacheControl: "max-age=7200",
 		wait: true,
 	}),
 );
