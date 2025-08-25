@@ -115,12 +115,18 @@ app.get("/feed/:id", async (c) => {
 				const season = item.itunesSeason ?? item.podcastSeason?.number;
 				const episode = item.itunesEpisode ?? item.podcastEpisode?.number;
 				const episodeType = item.itunesEpisodeType;
+				const chapters = item.podcastChapters;
+				const transcripts = item.podcastTranscripts;
+				const people = item.podcastPeople;
 
 				return {
 					...item,
 					season,
 					episode,
 					episodeType,
+					chapters,
+					transcripts,
+					people,
 				};
 			}),
 			lives: liveItems,
