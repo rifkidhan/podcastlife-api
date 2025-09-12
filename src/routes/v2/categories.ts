@@ -10,14 +10,16 @@ import { sanitizeHTML } from "#/utils/sanitize.ts";
 const app = new Hono();
 const xata = getXataClient();
 
-app.get(
-	"/*",
-	cache({
-		cacheName: "podcastlife-category",
-		cacheControl: "max-age=7200",
-		wait: true,
-	}),
-);
+if (!Deno.env.get("DEV")) {
+	app.get(
+		"/*",
+		cache({
+			cacheName: "podcastlife-category",
+			cacheControl: "max-age=7200",
+			wait: true,
+		}),
+	);
+}
 
 /**
  * Get feeds by categories

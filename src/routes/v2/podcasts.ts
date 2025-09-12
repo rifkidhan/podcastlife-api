@@ -17,42 +17,44 @@ const xata = getXataClient();
 
 const app = new Hono();
 
-// cache
-app.get(
-	"/feed/*",
-	cache({
-		cacheName: "podcastlife-feed",
-		cacheControl: "max-age=7200",
-		wait: true,
-	}),
-);
+if (!Deno.env.get("DEV")) {
+	// cache
+	app.get(
+		"/feed/*",
+		cache({
+			cacheName: "podcastlife-feed",
+			cacheControl: "max-age=7200",
+			wait: true,
+		}),
+	);
 
-app.get(
-	"/trending",
-	cache({
-		cacheName: "podcastlife-trending",
-		cacheControl: "max-age=7200",
-		wait: true,
-	}),
-);
+	app.get(
+		"/trending",
+		cache({
+			cacheName: "podcastlife-trending",
+			cacheControl: "max-age=7200",
+			wait: true,
+		}),
+	);
 
-app.get(
-	"/recent",
-	cache({
-		cacheName: "podcastlife-recent",
-		cacheControl: "max-age=7200",
-		wait: true,
-	}),
-);
+	app.get(
+		"/recent",
+		cache({
+			cacheName: "podcastlife-recent",
+			cacheControl: "max-age=7200",
+			wait: true,
+		}),
+	);
 
-app.get(
-	"/live",
-	cache({
-		cacheName: "podcastlife-live",
-		cacheControl: "max-age=720",
-		wait: true,
-	}),
-);
+	app.get(
+		"/live",
+		cache({
+			cacheName: "podcastlife-live",
+			cacheControl: "max-age=720",
+			wait: true,
+		}),
+	);
+}
 
 /**
  * Get feed detail.

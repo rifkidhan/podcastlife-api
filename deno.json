@@ -10,6 +10,7 @@
 		"@std/crypto": "jsr:@std/crypto@^1.0.5",
 		"@std/encoding": "jsr:@std/encoding@^1.0.10",
 		"@std/http": "jsr:@std/http@^1.0.20",
+		"@std/json": "jsr:@std/json@^1.0.2",
 		"blurhash": "npm:blurhash@^2.0.5",
 		"env": "jsr:@std/dotenv@^0.225.5/load",
 		"@hono/hono": "jsr:@hono/hono@^4.9.4",

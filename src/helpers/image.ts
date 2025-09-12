@@ -7,7 +7,6 @@ import {
 } from "https://deno.land/x/imagemagick_deno@0.0.31/mod.ts";
 import { encodeBase64 } from "@std/encoding";
 import { encode } from "blurhash";
-
 export async function initializeImageMagick() {
 	await initialize();
 }
