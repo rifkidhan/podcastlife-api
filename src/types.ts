@@ -50,10 +50,20 @@ export type PodcastLiveStream = Episodes & {
 };
 
 export type LiveItems = Episodes & {
+	feedTitle: string;
 	description?: string;
 	startTime: number;
 	endTime: number;
 	status: "ended" | "live";
 	podcastGuid: string;
 	explicit: boolean;
+	blurhash?: string;
+	author?: string;
 };
+
+export interface LiveDB {
+	id: string;
+	author?: string;
+	title: string;
+	hash?: string;
+}

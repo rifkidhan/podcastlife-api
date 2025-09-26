@@ -9,9 +9,8 @@ import { errorPodcastApi } from "#/helpers/httpError.ts";
 import { type TransactionOperation } from "npm:@xata.io/client@latest";
 import { groupBy } from "#/utils/group.ts";
 import { HTTPException } from "@hono/hono/http-exception";
-import type { LiveItems, PodcastLiveStream } from "#/types.ts";
+import type { LiveDB, LiveItems, PodcastLiveStream } from "#/types.ts";
 import { cache } from "@hono/hono/cache";
-import type { GetLiveParams } from "#/lib/live.ts";
 
 const xata = getXataClient();
 
@@ -309,7 +308,7 @@ app.get("/live", async (c) => {
 			get: {
 				table: "podcasts",
 				id: String(v),
-				columns: ["id", "author", "url"],
+				columns: ["id", "author", "title", "hash"],
 			},
 		};
 	}) satisfies TransactionOperation<DatabaseSchema, keyof DatabaseSchema>[];
@@ -322,7 +321,13 @@ app.get("/live", async (c) => {
 		// deno-lint-ignore no-explicit-any
 		.map((item: any) => {
 			return item.columns;
-		}) as GetLiveParams[];
+		}) as LiveDB[];
+
+	const feedDB = new Map<number, LiveDB>();
+
+	for (const feed of feeds) {
+		feedDB.set(Number(feed.id), feed);
+	}
 
 	const query = {
 		id: feeds.map(({ id }) => id).join(","),
@@ -336,9 +341,13 @@ app.get("/live", async (c) => {
 
 	for (const live of liveFromPodcastApi) {
 		const description = await sanitizeHTML(live.description, []);
+		const feed = feedDB.get(live.feedId);
 
 		liveData.push({
 			...live,
+			feedTitle: feed?.title,
+			feedAuthor: feed?.author,
+			blurhash: feed?.hash,
 			description: description,
 			explicit: live.explicit > 0 ? true : false,
 		});
