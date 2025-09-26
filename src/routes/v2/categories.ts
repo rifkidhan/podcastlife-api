@@ -1,6 +1,6 @@
 import { Hono } from "@hono/hono";
 import { getXataClient } from "#/db/xata.ts";
-import { CATEGORIES } from "#/helpers/constants.ts";
+import { CATEGORIES, VERSION } from "#/helpers/constants.ts";
 import { language } from "#/helpers/matching.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { cache } from "@hono/hono/cache";
@@ -9,12 +9,13 @@ import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 const app = new Hono();
 const xata = getXataClient();
+const cacheName = `v2-${VERSION}`;
 
 if (!Deno.env.get("DEV")) {
 	app.get(
 		"/*",
 		cache({
-			cacheName: "podcastlife-category",
+			cacheName: cacheName,
 			cacheControl: "max-age=7200",
 			wait: true,
 		}),

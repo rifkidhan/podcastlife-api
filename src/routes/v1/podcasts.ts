@@ -11,17 +11,20 @@ import { groupBy } from "#/utils/group.ts";
 import { HTTPException } from "@hono/hono/http-exception";
 import type { LiveDB, LiveItems, PodcastLiveStream } from "#/types.ts";
 import { cache } from "@hono/hono/cache";
+import { VERSION } from "#/helpers/constants.ts";
 
 const xata = getXataClient();
 
 const app = new Hono();
+
+const cacheName = `v1-${VERSION}`;
 
 if (!Deno.env.get("DEV")) {
 	// cache
 	app.get(
 		"/feed/*",
 		cache({
-			cacheName: "feed",
+			cacheName: cacheName,
 			cacheControl: "max-age=7200",
 			wait: true,
 		}),
@@ -30,7 +33,7 @@ if (!Deno.env.get("DEV")) {
 	app.get(
 		"/trending",
 		cache({
-			cacheName: "trending",
+			cacheName: cacheName,
 			cacheControl: "max-age=7200",
 			wait: true,
 		}),
@@ -39,7 +42,7 @@ if (!Deno.env.get("DEV")) {
 	app.get(
 		"/recent",
 		cache({
-			cacheName: "recent",
+			cacheName: cacheName,
 			cacheControl: "max-age=7200",
 			wait: true,
 		}),
@@ -48,7 +51,7 @@ if (!Deno.env.get("DEV")) {
 	app.get(
 		"/live",
 		cache({
-			cacheName: "live",
+			cacheName: cacheName,
 			cacheControl: "max-age=720",
 			wait: true,
 		}),
@@ -346,7 +349,7 @@ app.get("/live", async (c) => {
 		liveData.push({
 			...live,
 			feedTitle: feed?.title,
-			feedAuthor: feed?.author,
+			author: feed?.author,
 			blurhash: feed?.hash,
 			description: description,
 			explicit: live.explicit > 0 ? true : false,
