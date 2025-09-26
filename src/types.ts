@@ -48,3 +48,12 @@ export type PodcastLiveStream = Episodes & {
 		[key: string]: string;
 	};
 };
+
+export type LiveItems = Episodes & {
+	description?: string;
+	startTime: number;
+	endTime: number;
+	status: "ended" | "live";
+	podcastGuid: string;
+	explicit: boolean;
+};

@@ -5,8 +5,10 @@ import { bearerAuth } from "@hono/hono/bearer-auth";
 import { logger } from "@hono/hono/logger";
 import { etag, RETAINED_304_HEADERS } from "@hono/hono/etag";
 import { serveStatic } from "@hono/hono/deno";
-import { default as podcasts } from "#/routes/v2/podcasts.ts";
-import { default as categories } from "#/routes/v2/categories.ts";
+import { default as podcastsV2 } from "#/routes/v2/podcasts.ts";
+import { default as categoriesV2 } from "#/routes/v2/categories.ts";
+import { default as podcastsV1 } from "#/routes/v1/podcasts.ts";
+import { default as categoriesV1 } from "#/routes/v1/categories.ts";
 import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { except } from "@hono/hono/combine";
@@ -68,11 +70,14 @@ app.get("/", (c) => {
 	return c.text("Podcastlife API");
 });
 
+app.route("/v1/", podcastsV1);
+app.route("/v1/categories", categoriesV1);
+
 /**
  * v2 route
  */
-app.route("/v2/", podcasts);
-app.route("/v2/categories", categories);
+app.route("/v2/", podcastsV2);
+app.route("/v2/categories", categoriesV2);
 
 console.log("Podcastlife API");
 Deno.serve(app.fetch);

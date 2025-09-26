@@ -13,7 +13,7 @@
 		"@std/json": "jsr:@std/json@^1.0.2",
 		"blurhash": "npm:blurhash@^2.0.5",
 		"env": "jsr:@std/dotenv@^0.225.5/load",
-		"@hono/hono": "jsr:@hono/hono@^4.9.4",
+		"@hono/hono": "jsr:@hono/hono@^4.9.8",
 		"podcast-partytime": "npm:podcast-partytime@4.9.1",
 		"rehype-parse": "npm:rehype-parse@^9.0.1",
 		"rehype-sanitize": "npm:rehype-sanitize@^6.0.0",
