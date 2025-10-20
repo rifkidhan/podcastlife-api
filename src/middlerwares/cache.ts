@@ -9,8 +9,8 @@ export const cache = (options: {
 			c.header("Cache-Control", options.cacheControl, { append: true });
 		}
 		const date = new Date().toUTCString();
-		c.header("Last-Modified", date, { append: true });
-		c.header("X-Cache", "MISS", { append: true });
+		c.header("Last-Modified", date);
+		c.header("X-Cache", "MISS");
 	};
 
 	// check cache from last modified

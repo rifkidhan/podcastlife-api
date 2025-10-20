@@ -3,6 +3,7 @@ import { Hono } from "@hono/hono";
 import { HTTPException } from "@hono/hono/http-exception";
 import { bearerAuth } from "@hono/hono/bearer-auth";
 import { logger } from "@hono/hono/logger";
+import { etag } from "@hono/hono/etag";
 import { serveStatic } from "@hono/hono/deno";
 import { default as podcastsV2 } from "#/routes/v2/podcasts.ts";
 import { default as categoriesV2 } from "#/routes/v2/categories.ts";
@@ -33,6 +34,7 @@ app.use(
 	except(
 		["/", "/favicon.ico"],
 		bearerAuth({ token: Deno.env.get("APP_KEY") as string }),
+		etag(),
 	),
 );
 
