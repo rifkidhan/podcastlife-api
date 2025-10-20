@@ -10,23 +10,19 @@ import { type TransactionOperation } from "npm:@xata.io/client@latest";
 import { groupBy } from "#/utils/group.ts";
 import { HTTPException } from "@hono/hono/http-exception";
 import type { LiveDB, LiveItems, PodcastLiveStream } from "#/types.ts";
-import { cache } from "@hono/hono/cache";
-import { VERSION } from "#/helpers/constants.ts";
+import { cache } from "#/middlerwares/cache.ts";
 
 const xata = getXataClient();
-
 const app = new Hono();
+const cacheName = "podcastlife-v1";
 
-const cacheName = `v1-${VERSION}`;
-
+// cache
 if (!Deno.env.get("DEV")) {
-	// cache
 	app.get(
 		"/feed/*",
 		cache({
 			cacheName: cacheName,
 			cacheControl: "max-age=7200",
-			wait: true,
 		}),
 	);
 
@@ -35,7 +31,6 @@ if (!Deno.env.get("DEV")) {
 		cache({
 			cacheName: cacheName,
 			cacheControl: "max-age=7200",
-			wait: true,
 		}),
 	);
 
@@ -44,7 +39,6 @@ if (!Deno.env.get("DEV")) {
 		cache({
 			cacheName: cacheName,
 			cacheControl: "max-age=7200",
-			wait: true,
 		}),
 	);
 
@@ -53,7 +47,6 @@ if (!Deno.env.get("DEV")) {
 		cache({
 			cacheName: cacheName,
 			cacheControl: "max-age=720",
-			wait: true,
 		}),
 	);
 }
@@ -153,7 +146,7 @@ app.get("/feed/:id/:guid", async (c) => {
 	const data = await podcastApi("/episodes/byguid", query).then((res) => res.json());
 
 	const episode = data.episode;
-	const description = await sanitizeHTML(episode.description);
+	const description = await sanitizeHTML(episode.description, []);
 
 	logs("get episode from ", id, "guid ", guid);
 

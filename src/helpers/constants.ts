@@ -1,7 +1,5 @@
 export const USER_AGENT = "PodcastLife/1.0";
 
-export const VERSION = "eb2a7d8c2bc0efc1b5ea3917d979b905";
-
 export const CATEGORIES = [
 	{
 		id: "rec_cm37srcvc5438u7rca50",

@@ -1,15 +1,15 @@
 import { Hono } from "@hono/hono";
 import { getXataClient } from "#/db/xata.ts";
-import { CATEGORIES, VERSION } from "#/helpers/constants.ts";
+import { CATEGORIES } from "#/helpers/constants.ts";
 import { language } from "#/helpers/matching.ts";
 import { logs } from "#/middlerwares/log.ts";
-import { cache } from "@hono/hono/cache";
+import { cache } from "#/middlerwares/cache.ts";
 import { HTTPException } from "@hono/hono/http-exception";
 import { sanitizeHTML } from "#/utils/sanitize.ts";
 
 const app = new Hono();
 const xata = getXataClient();
-const cacheName = `v1-${VERSION}`;
+const cacheName = "podcastlife-v1";
 
 if (!Deno.env.get("DEV")) {
 	app.get(
@@ -17,7 +17,6 @@ if (!Deno.env.get("DEV")) {
 		cache({
 			cacheName: cacheName,
 			cacheControl: "max-age=7200",
-			wait: true,
 		}),
 	);
 }
