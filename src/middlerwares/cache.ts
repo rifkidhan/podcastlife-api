@@ -34,6 +34,7 @@ export const cache = (options: {
 		if (response) {
 			// check age
 			if (isCache(response)) {
+				console.log("cache hit");
 				response.headers.set("X-Cache", "HIT");
 				return new Response(response.body, response);
 			}
@@ -44,6 +45,7 @@ export const cache = (options: {
 			}
 			addHeader(c);
 			const copy = c.res.clone();
+			console.log("cache stale");
 			await cache.put(key, copy);
 		} else {
 			// add data to cache
@@ -53,6 +55,7 @@ export const cache = (options: {
 			}
 			addHeader(c);
 			const copy = c.res.clone();
+			console.log("cache miss");
 			await cache.put(key, copy);
 		}
 	};
