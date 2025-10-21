@@ -13,10 +13,11 @@ import { updateDB } from "#/script/updateDb.ts";
 import { logs } from "#/middlerwares/log.ts";
 import { except } from "@hono/hono/combine";
 import { initializeImageMagick } from "#/helpers/image.ts";
+import { DEV } from "#/helpers/constants.ts";
 
 await initializeImageMagick();
 
-if (!Deno.env.get("DEV")) {
+if (!DEV) {
 	Deno.cron("feeds update", "0 */2 * * *", async () => {
 		console.log(`update feeds starting`);
 		await updateDB();

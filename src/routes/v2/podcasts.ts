@@ -11,13 +11,14 @@ import { groupBy } from "#/utils/group.ts";
 import { HTTPException } from "@hono/hono/http-exception";
 import { PodcastLiveStream } from "#/types.ts";
 import { getLiveItem, type GetLiveParams, type PodcastLiveItem } from "#/lib/live.ts";
+import { DEV } from "#/helpers/constants.ts";
 import { cache } from "#/middlerwares/cache.ts";
 
 const xata = getXataClient();
 const app = new Hono();
 const cacheName = "podcastlife-v2";
 
-if (!Deno.env.get("DEV")) {
+if (!DEV) {
 	// cache
 	app.get(
 		"/feed/*",

@@ -1,5 +1,7 @@
 export const USER_AGENT = "PodcastLife/1.0";
 
+export const DEV = Deno.env.get("DEV") && Deno.env.get("DEV") === "true" ? true : false;
+
 export const CATEGORIES = [
 	{
 		id: "rec_cm37srcvc5438u7rca50",

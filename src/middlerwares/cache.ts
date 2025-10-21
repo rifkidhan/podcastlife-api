@@ -1,4 +1,5 @@
 import type { Context, MiddlewareHandler } from "@hono/hono";
+import { DEV } from "#/helpers/constants.ts";
 
 export const cache = (options: {
 	cacheControl?: string;
@@ -19,8 +20,16 @@ export const cache = (options: {
 			? parseInt(options.cacheControl.match(/max-age=(\d+)/)?.[1] || "0", 10)
 			: 0;
 		const lastModified = res.headers.get("Last-Modified") || "";
-		const modifiedDate = new Date(lastModified).getTime();
-		const age = (Date.now() - modifiedDate) / 1000;
+
+		if (DEV) {
+			const modifiedDate = new Date(lastModified).getTime();
+			const age = (Date.now() - modifiedDate) / 1000;
+
+			return maxAge > age;
+		}
+
+		const ageHeader = res.headers.get("Age") || "0";
+		const age = parseInt(ageHeader, 10);
 
 		return maxAge > age;
 	};
